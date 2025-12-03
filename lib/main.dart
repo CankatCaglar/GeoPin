@@ -37,12 +37,14 @@ class Category {
     required this.title,
     required this.icon,
     required this.isLocked,
+    this.backgroundImage,
   });
 
   final String id;
   final String title;
   final IconData icon;
   final bool isLocked;
+  final String? backgroundImage;
 }
 
 class Question {
@@ -69,36 +71,56 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       title: 'Tourist Places',
       icon: Icons.travel_explore,
       isLocked: false,
+      backgroundImage: 'assets/images/tourist_places.jpg',
+    ),
+    Category(
+      id: 'countries',
+      title: 'Countries',
+      icon: Icons.map,
+      isLocked: false,
+      backgroundImage: 'assets/images/countries.jpg',
     ),
     Category(
       id: 'capitals',
       title: 'Capitals',
-      icon: Icons.location_city,
+      icon: Icons.location_on,
       isLocked: false,
+      backgroundImage: 'assets/images/capitals.jpg',
+    ),
+    Category(
+      id: 'cities',
+      title: 'Cities',
+      icon: Icons.apartment,
+      isLocked: false,
+      backgroundImage: 'assets/images/cities.jpg',
     ),
     Category(
       id: 'stadiums',
       title: 'Football Stadiums',
       icon: Icons.sports_soccer,
       isLocked: true,
+      backgroundImage: 'assets/images/stadiums.jpg',
     ),
     Category(
       id: 'monuments',
       title: 'Historical Monuments',
       icon: Icons.account_balance,
       isLocked: true,
+      backgroundImage: 'assets/images/monuments.jpg',
     ),
     Category(
       id: 'movies',
       title: 'Movie Locations',
       icon: Icons.movie,
       isLocked: true,
+      backgroundImage: 'assets/images/movies.jpg',
     ),
     Category(
       id: 'resorts',
       title: 'Holiday Resorts',
       icon: Icons.beach_access,
       isLocked: true,
+      backgroundImage: 'assets/images/resorts.jpg',
     ),
   ];
 });
@@ -121,7 +143,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
@@ -143,8 +165,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController.forward();
 
-    // Navigate to main screen after 0.5 seconds
-    Future.delayed(const Duration(seconds: 1), () {
+    // Navigate to main screen after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
@@ -339,6 +361,16 @@ class _CategoryCard extends ConsumerWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
+          image: category.backgroundImage != null
+              ? DecorationImage(
+                  image: AssetImage(category.backgroundImage!),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.3),
+                    BlendMode.darken,
+                  ),
+                )
+              : null,
         ),
         child: Stack(
           children: [
@@ -358,12 +390,6 @@ class _CategoryCard extends ConsumerWidget {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    isLocked ? 'PRO - Locked' : 'Free',
-                    style: TextStyle(
-                      color: isLocked ? Colors.amber : Colors.white70,
                     ),
                   ),
                 ],

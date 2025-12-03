@@ -1,5 +1,5 @@
-name: geo_quiz_master
-description: GeoQuiz Master - Nerede tarzı harita tabanlı trivia oyunu.
+name: geopin
+description: GeoPin - Test your geography knowledge with fun location challenges.
 publish_to: "none"
 
 version: 1.0.0+1
@@ -31,5 +31,6 @@ flutter:
 
   assets:
     - assets/data/categories.json
+    - assets/images/
 
 
