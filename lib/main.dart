@@ -50,12 +50,14 @@ class Category {
 class Question {
   Question({
     required this.id,
+    required this.categoryId,
     required this.prompt,
     required this.lat,
     required this.lng,
   });
 
   final String id;
+  final String categoryId;
   final String prompt;
   final double lat;
   final double lng;
@@ -340,12 +342,17 @@ class _CategoryCard extends ConsumerWidget {
           _showPaywall(context, category);
         } else {
           final questions = ref.read(questionsProvider);
+          // Filter questions for this category
+          final categoryQuestions = questions
+              .where((q) => q.categoryId == category.id)
+              .toList();
+              
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => GameScreen(
                 categoryId: category.id,
                 categoryTitle: category.title,
-                questions: questions,
+                questions: categoryQuestions,
               ),
             ),
           );
@@ -522,93 +529,109 @@ class _CategoryCard extends ConsumerWidget {
 // SORULAR VERİTABANI
 final questionsProvider = Provider<List<Question>>((ref) {
   return [
+    // --- TOURIST PLACES ---
     // EASY - Very famous tourist places everyone knows
     Question(
       id: 'statue_liberty',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Statue of Liberty?',
       lat: 40.6892,
       lng: -74.0445,
     ),
     Question(
       id: 'eiffel',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Eiffel Tower?',
       lat: 48.8584,
       lng: 2.2945,
     ),
     Question(
       id: 'colosseum',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Colosseum?',
       lat: 41.8902,
       lng: 12.4922,
     ),
     Question(
       id: 'bigben',
+      categoryId: 'tourist_places',
       prompt: 'Where is Big Ben?',
       lat: 51.4994,
       lng: -0.1245,
     ),
     Question(
       id: 'sydney_opera',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Sydney Opera House?',
       lat: -33.8568,
       lng: 151.2153,
     ),
     Question(
       id: 'taj_mahal',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Taj Mahal?',
       lat: 27.1751,
       lng: 78.0421,
     ),
     Question(
       id: 'great_wall',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Great Wall of China?',
       lat: 40.4319,
       lng: 116.5704,
     ),
     Question(
       id: 'golden_gate',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Golden Gate Bridge?',
       lat: 37.8199,
       lng: -122.4783,
     ),
     Question(
       id: 'christ_redeemer',
+      categoryId: 'tourist_places',
       prompt: 'Where is Christ the Redeemer?',
       lat: -22.9519,
       lng: -43.2105,
     ),
     Question(
       id: 'burj_khalifa',
+      categoryId: 'tourist_places',
       prompt: 'Where is Burj Khalifa?',
       lat: 25.1972,
       lng: 55.2744,
     ),
     Question(
       id: 'louvre',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Louvre Museum?',
       lat: 48.8606,
       lng: 2.3376,
     ),
     Question(
       id: 'stonehenge',
+      categoryId: 'tourist_places',
       prompt: 'Where is Stonehenge?',
       lat: 51.1789,
       lng: -1.8262,
     ),
     Question(
       id: 'notre_dame',
+      categoryId: 'tourist_places',
       prompt: 'Where is Notre Dame Cathedral?',
       lat: 48.8530,
       lng: 2.3499,
     ),
     Question(
       id: 'versailles',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Palace of Versailles?',
       lat: 48.8049,
       lng: 2.1204,
     ),
     Question(
       id: 'acropolis',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Acropolis?',
       lat: 37.9715,
       lng: 23.7267,
@@ -617,96 +640,112 @@ final questionsProvider = Provider<List<Question>>((ref) {
     // MEDIUM - Well-known but might require some thought
     Question(
       id: 'sagrada_familia',
+      categoryId: 'tourist_places',
       prompt: 'Where is La Sagrada Familia?',
       lat: 41.4036,
       lng: 2.1744,
     ),
     Question(
       id: 'neuschwanstein',
+      categoryId: 'tourist_places',
       prompt: 'Where is Neuschwanstein Castle?',
       lat: 47.5576,
       lng: 10.7498,
     ),
     Question(
       id: 'brandenburg_gate',
+      categoryId: 'tourist_places',
       prompt: 'Where is Brandenburg Gate?',
       lat: 52.5163,
       lng: 13.3777,
     ),
     Question(
       id: 'saint_pauls',
+      categoryId: 'tourist_places',
       prompt: 'Where is St. Paul\'s Cathedral?',
       lat: 51.5138,
       lng: -0.0984,
     ),
     Question(
       id: 'windmills',
+      categoryId: 'tourist_places',
       prompt: 'Where are the Amsterdam Windmills?',
       lat: 52.3740,
       lng: 4.8897,
     ),
     Question(
       id: 'petra',
+      categoryId: 'tourist_places',
       prompt: 'Where is Petra?',
       lat: 30.3285,
       lng: 35.4444,
     ),
     Question(
       id: 'angkor_wat',
+      categoryId: 'tourist_places',
       prompt: 'Where is Angkor Wat?',
       lat: 13.4125,
       lng: 103.8670,
     ),
     Question(
       id: 'chichen_itza',
+      categoryId: 'tourist_places',
       prompt: 'Where is Chichen Itza?',
       lat: 20.6843,
       lng: -88.5678,
     ),
     Question(
       id: 'niagara_falls',
+      categoryId: 'tourist_places',
       prompt: 'Where are Niagara Falls?',
       lat: 43.0962,
       lng: -79.0377,
     ),
     Question(
       id: 'grand_canyon',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Grand Canyon?',
       lat: 36.1069,
       lng: -112.1129,
     ),
     Question(
       id: 'mount_rushmore',
+      categoryId: 'tourist_places',
       prompt: 'Where is Mount Rushmore?',
       lat: 43.8791,
       lng: -103.4591,
     ),
     Question(
       id: 'times_square',
+      categoryId: 'tourist_places',
       prompt: 'Where is Times Square?',
       lat: 40.7580,
       lng: -73.9855,
     ),
     Question(
       id: 'central_park',
+      categoryId: 'tourist_places',
       prompt: 'Where is Central Park?',
       lat: 40.7829,
       lng: -73.9654,
     ),
     Question(
       id: 'empire_state',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Empire State Building?',
       lat: 40.7484,
       lng: -73.9857,
     ),
     Question(
       id: 'disneyland',
+      categoryId: 'tourist_places',
       prompt: 'Where is Disneyland?',
       lat: 33.8121,
       lng: -117.9190,
     ),
     Question(
       id: 'yosemite',
+      categoryId: 'tourist_places',
       prompt: 'Where is Yosemite National Park?',
       lat: 37.8651,
       lng: -119.5383,
@@ -715,57 +754,353 @@ final questionsProvider = Provider<List<Question>>((ref) {
     // HARD - More challenging locations
     Question(
       id: 'machu_picchu',
+      categoryId: 'tourist_places',
       prompt: 'Where is Machu Picchu?',
       lat: -13.1631,
       lng: -72.5450,
     ),
     Question(
       id: 'yellowstone',
+      categoryId: 'tourist_places',
       prompt: 'Where is Yellowstone National Park?',
       lat: 44.4280,
       lng: -110.5885,
     ),
     Question(
       id: 'liberty_bell',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Liberty Bell?',
       lat: 39.9496,
       lng: -75.1503,
     ),
     Question(
       id: 'space_needle',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Space Needle?',
       lat: 47.6205,
       lng: -122.3493,
     ),
     Question(
       id: 'hoover_dam',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Hoover Dam?',
       lat: 36.0161,
       lng: -114.7377,
     ),
     Question(
       id: 'miami_beach',
+      categoryId: 'tourist_places',
       prompt: 'Where is Miami Beach?',
       lat: 25.7907,
       lng: -80.1300,
     ),
     Question(
       id: 'las_vegas',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Las Vegas Strip?',
       lat: 36.1147,
       lng: -115.1728,
     ),
     Question(
       id: 'hollywood_sign',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Hollywood Sign?',
       lat: 34.1341,
       lng: -118.3215,
     ),
     Question(
       id: 'colosseum_mexico',
+      categoryId: 'tourist_places',
       prompt: 'Where is the Colosseum in Mexico City?',
       lat: 19.4326,
       lng: -99.1332,
+    ),
+
+    // --- COUNTRIES ---
+    // EASY - Large, distinct, or famous countries
+    Question(
+      id: 'france',
+      categoryId: 'countries',
+      prompt: 'Where is France?',
+      lat: 46.2276,
+      lng: 2.2137,
+    ),
+    Question(
+      id: 'usa',
+      categoryId: 'countries',
+      prompt: 'Where is the United States?',
+      lat: 37.0902,
+      lng: -95.7129,
+    ),
+    Question(
+      id: 'china',
+      categoryId: 'countries',
+      prompt: 'Where is China?',
+      lat: 35.8617,
+      lng: 104.1954,
+    ),
+    Question(
+      id: 'brazil',
+      categoryId: 'countries',
+      prompt: 'Where is Brazil?',
+      lat: -14.2350,
+      lng: -51.9253,
+    ),
+    Question(
+      id: 'australia',
+      categoryId: 'countries',
+      prompt: 'Where is Australia?',
+      lat: -25.2744,
+      lng: 133.7751,
+    ),
+    Question(
+      id: 'india',
+      categoryId: 'countries',
+      prompt: 'Where is India?',
+      lat: 20.5937,
+      lng: 78.9629,
+    ),
+    Question(
+      id: 'russia',
+      categoryId: 'countries',
+      prompt: 'Where is Russia?',
+      lat: 61.5240,
+      lng: 105.3188,
+    ),
+    Question(
+      id: 'italy',
+      categoryId: 'countries',
+      prompt: 'Where is Italy?',
+      lat: 41.8719,
+      lng: 12.5674,
+    ),
+    Question(
+      id: 'united_kingdom',
+      categoryId: 'countries',
+      prompt: 'Where is the United Kingdom?',
+      lat: 55.3781,
+      lng: -3.4360,
+    ),
+    Question(
+      id: 'germany',
+      categoryId: 'countries',
+      prompt: 'Where is Germany?',
+      lat: 51.1657,
+      lng: 10.4515,
+    ),
+    Question(
+      id: 'japan',
+      categoryId: 'countries',
+      prompt: 'Where is Japan?',
+      lat: 36.2048,
+      lng: 138.2529,
+    ),
+    Question(
+      id: 'canada',
+      categoryId: 'countries',
+      prompt: 'Where is Canada?',
+      lat: 56.1304,
+      lng: -106.3468,
+    ),
+    Question(
+      id: 'mexico',
+      categoryId: 'countries',
+      prompt: 'Where is Mexico?',
+      lat: 23.6345,
+      lng: -102.5528,
+    ),
+    Question(
+      id: 'egypt',
+      categoryId: 'countries',
+      prompt: 'Where is Egypt?',
+      lat: 26.8206,
+      lng: 30.8025,
+    ),
+    Question(
+      id: 'spain',
+      categoryId: 'countries',
+      prompt: 'Where is Spain?',
+      lat: 40.4637,
+      lng: -3.7492,
+    ),
+
+    // MEDIUM - Moderately difficult countries
+    Question(
+      id: 'turkey',
+      categoryId: 'countries',
+      prompt: 'Where is Turkey?',
+      lat: 38.9637,
+      lng: 35.2433,
+    ),
+    Question(
+      id: 'argentina',
+      categoryId: 'countries',
+      prompt: 'Where is Argentina?',
+      lat: -38.4161,
+      lng: -63.6167,
+    ),
+    Question(
+      id: 'saudi_arabia',
+      categoryId: 'countries',
+      prompt: 'Where is Saudi Arabia?',
+      lat: 23.8859,
+      lng: 45.0792,
+    ),
+    Question(
+      id: 'south_africa',
+      categoryId: 'countries',
+      prompt: 'Where is South Africa?',
+      lat: -30.5595,
+      lng: 22.9375,
+    ),
+    Question(
+      id: 'indonesia',
+      categoryId: 'countries',
+      prompt: 'Where is Indonesia?',
+      lat: -0.7893,
+      lng: 113.9213,
+    ),
+    Question(
+      id: 'iran',
+      categoryId: 'countries',
+      prompt: 'Where is Iran?',
+      lat: 32.4279,
+      lng: 53.6880,
+    ),
+    Question(
+      id: 'ukraine',
+      categoryId: 'countries',
+      prompt: 'Where is Ukraine?',
+      lat: 48.3794,
+      lng: 31.1656,
+    ),
+    Question(
+      id: 'thailand',
+      categoryId: 'countries',
+      prompt: 'Where is Thailand?',
+      lat: 15.8700,
+      lng: 100.9925,
+    ),
+    Question(
+      id: 'poland',
+      categoryId: 'countries',
+      prompt: 'Where is Poland?',
+      lat: 51.9194,
+      lng: 19.1451,
+    ),
+    Question(
+      id: 'colombia',
+      categoryId: 'countries',
+      prompt: 'Where is Colombia?',
+      lat: 4.5709,
+      lng: -74.2973,
+    ),
+    Question(
+      id: 'sweden',
+      categoryId: 'countries',
+      prompt: 'Where is Sweden?',
+      lat: 60.1282,
+      lng: 18.6435,
+    ),
+    Question(
+      id: 'norway',
+      categoryId: 'countries',
+      prompt: 'Where is Norway?',
+      lat: 60.4720,
+      lng: 8.4689,
+    ),
+    Question(
+      id: 'pakistan',
+      categoryId: 'countries',
+      prompt: 'Where is Pakistan?',
+      lat: 30.3753,
+      lng: 69.3451,
+    ),
+    Question(
+      id: 'peru',
+      categoryId: 'countries',
+      prompt: 'Where is Peru?',
+      lat: -9.1900,
+      lng: -75.0152,
+    ),
+    Question(
+      id: 'vietnam',
+      categoryId: 'countries',
+      prompt: 'Where is Vietnam?',
+      lat: 14.0583,
+      lng: 108.2772,
+    ),
+
+    // HARD - Smaller or less obvious countries
+    Question(
+      id: 'greece',
+      categoryId: 'countries',
+      prompt: 'Where is Greece?',
+      lat: 39.0742,
+      lng: 21.8243,
+    ),
+    Question(
+      id: 'portugal',
+      categoryId: 'countries',
+      prompt: 'Where is Portugal?',
+      lat: 39.3999,
+      lng: -8.2245,
+    ),
+    Question(
+      id: 'chile',
+      categoryId: 'countries',
+      prompt: 'Where is Chile?',
+      lat: -35.6751,
+      lng: -71.5430,
+    ),
+    Question(
+      id: 'new_zealand',
+      categoryId: 'countries',
+      prompt: 'Where is New Zealand?',
+      lat: -40.9006,
+      lng: 174.8860,
+    ),
+    Question(
+      id: 'iceland',
+      categoryId: 'countries',
+      prompt: 'Where is Iceland?',
+      lat: 64.9631,
+      lng: -19.0208,
+    ),
+    Question(
+      id: 'madagascar',
+      categoryId: 'countries',
+      prompt: 'Where is Madagascar?',
+      lat: -18.7669,
+      lng: 46.8691,
+    ),
+    Question(
+      id: 'morocco',
+      categoryId: 'countries',
+      prompt: 'Where is Morocco?',
+      lat: 31.7917,
+      lng: -7.0926,
+    ),
+    Question(
+      id: 'switzerland',
+      categoryId: 'countries',
+      prompt: 'Where is Switzerland?',
+      lat: 46.8182,
+      lng: 8.2275,
+    ),
+    Question(
+      id: 'cuba',
+      categoryId: 'countries',
+      prompt: 'Where is Cuba?',
+      lat: 21.5218,
+      lng: -77.7812,
+    ),
+    Question(
+      id: 'north_korea',
+      categoryId: 'countries',
+      prompt: 'Where is North Korea?',
+      lat: 40.3399,
+      lng: 127.5101,
     ),
   ];
 });
@@ -834,8 +1169,10 @@ class GameState {
 }
 
 class GameNotifier extends StateNotifier<GameState> {
-  GameNotifier(List<Question> questions)
+  GameNotifier(List<Question> questions, {this.categoryId})
       : super(GameState(questions: questions));
+  
+  final String? categoryId;
 
   void setUserGuess(LatLng guess) {
     // Eğer bu soru daha önce cevaplandıysa, tahmini sıfırlama
@@ -874,6 +1211,15 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 
   int _calculateScore(double km) {
+    // Ülkeler kategorisi için özel skor: Ülke sınırları içinde = tam puan
+    if (categoryId == 'countries') {
+      if (km <= 1500) return 1000; // Ülke sınırları içinde
+      if (km <= 3000) return 500;  // Yakın ülke
+      if (km <= 5000) return 250;  // Aynı kıta
+      return 100;
+    }
+    
+    // Diğer kategoriler için normal skor
     if (km <= 50) return 1000;
     if (km <= 200) return 500;
     if (km <= 500) return 250;
@@ -919,8 +1265,11 @@ class GameNotifier extends StateNotifier<GameState> {
   }
 }
 
-final gameProvider = StateNotifierProvider.family<GameNotifier, GameState, List<Question>>(
-  (ref, questions) => GameNotifier(questions),
+// Game provider için parametre tuple'ı
+typedef GameProviderParams = ({List<Question> questions, String categoryId});
+
+final gameProvider = StateNotifierProvider.family<GameNotifier, GameState, GameProviderParams>(
+  (ref, params) => GameNotifier(params.questions, categoryId: params.categoryId),
 );
 
 // GAME SCREEN (HARİTA)
@@ -943,6 +1292,9 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   final MapController _mapController = MapController();
+  
+  // Helper getter for game provider params
+  GameProviderParams get _gameParams => (questions: widget.questions, categoryId: widget.categoryId);
 
   // İki nokta arasındaki orta noktayı hesapla
   LatLng _getMidPoint(LatLng point1, LatLng point2) {
@@ -962,13 +1314,23 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _resetMapView() {
-    final game = ref.read(gameProvider(widget.questions));
+    // Ülkeler kategorisinde haritayı resetleme - hile olmasın!
+    if (widget.categoryId == 'countries') {
+      return;
+    }
+    
+    final game = ref.read(gameProvider(_gameParams));
     _mapController.move(game.target, 4);
     _mapController.rotate(0);
   }
 
   void _zoomToAnswer() {
-    final game = ref.read(gameProvider(widget.questions));
+    // Ülkeler kategorisinde otomatik zoom yapma - hile olmasın!
+    if (widget.categoryId == 'countries') {
+      return;
+    }
+    
+    final game = ref.read(gameProvider(_gameParams));
     // Zoom to show both user guess and correct answer
     final userPoint = game.currentAnswer?.userGuess ?? game.userGuess!;
     final bounds = LatLngBounds(userPoint, game.target);
@@ -977,10 +1339,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final game = ref.watch(gameProvider(widget.questions));
+    final game = ref.watch(gameProvider(_gameParams));
 
-    // Haritanın başlangıç odağı: Mevcut sorunun konumuna yakın
-    final center = game.target;
+    // Haritanın başlangıç odağı: Ülkeler için dünya haritası, diğerleri için soru konumu
+    final center = widget.categoryId == 'countries' 
+        ? const LatLng(20, 0) // Dünyanın ortası
+        : game.target;
+    final initialZoom = widget.categoryId == 'countries' ? 2.0 : 4.0;
 
     return Scaffold(
       body: Stack(
@@ -990,7 +1355,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             mapController: _mapController,
             options: MapOptions(
               initialCenter: center,
-              initialZoom: 4,
+              initialZoom: initialZoom,
               minZoom: 2,
               maxZoom: 18,
               interactionOptions: const InteractionOptions(
@@ -998,16 +1363,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
               onTap: (tapPosition, point) {
                 if (!game.hasAnswered) {
-                  ref.read(gameProvider(widget.questions).notifier).setUserGuess(point);
+                  ref.read(gameProvider(_gameParams).notifier).setUserGuess(point);
                 }
               },
             ),
             children: [
-              // Original OpenStreetMap tiles with English labels
+              // Ülkeler için renkli sınırlı ama etiketsiz harita, diğerleri için normal harita
               TileLayer(
-                urlTemplate:
-                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subdomains: const ['a', 'b', 'c'],
+                urlTemplate: widget.categoryId == 'countries'
+                    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: const ['a', 'b', 'c', 'd'],
                 userAgentPackageName: 'com.example.geo_quiz_master',
                 retinaMode: true,
               ),
@@ -1222,7 +1588,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       ),
                       onPressed: () {
                         ref
-                            .read(gameProvider(widget.questions).notifier)
+                            .read(gameProvider(_gameParams).notifier)
                             .calculateDistance();
                         _showResultDialog(context, ref);
                       },
@@ -1250,7 +1616,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             ),
                             onPressed: () {
                               ref
-                                  .read(gameProvider(widget.questions).notifier)
+                                  .read(gameProvider(_gameParams).notifier)
                                   .previousQuestion();
                               // Reset map view when going to previous question
                               _resetMapView();
@@ -1282,7 +1648,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               }
                             } else {
                               ref
-                                  .read(gameProvider(widget.questions).notifier)
+                                  .read(gameProvider(_gameParams).notifier)
                                   .nextQuestion();
                               // Reset map view for next question
                               _resetMapView();
@@ -1309,9 +1675,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _showResultDialog(BuildContext context, WidgetRef ref) {
-    final game = ref.read(gameProvider(widget.questions));
+    final game = ref.read(gameProvider(_gameParams));
     final km = game.distanceKm ?? 0;
-    final score = ref.read(gameProvider(widget.questions).notifier).calculateScore();
+    final score = ref.read(gameProvider(_gameParams).notifier).calculateScore();
 
     // Auto-zoom to answer location
     _zoomToAnswer();
@@ -1393,7 +1759,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _showFinalResults(BuildContext context, WidgetRef ref) {
-    final game = ref.read(gameProvider(widget.questions));
+    final game = ref.read(gameProvider(_gameParams));
     final totalScore = game.totalScore;
     final totalQuestions = game.totalQuestions;
     final maxPossibleScore = totalQuestions * 1000;
