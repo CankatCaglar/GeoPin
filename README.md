@@ -1,5 +1,4 @@
-# geo_quiz_master
-
+# GeoPin
 A new Flutter project.
 
 ## Getting Started
