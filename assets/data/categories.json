@@ -1,0 +1,74 @@
+{
+  "categories": [
+    {
+      "id": "countries",
+      "title": "Ülkeler",
+      "type": "country",
+      "isLocked": false,
+      "questions": [
+        {
+          "id": "tr",
+          "prompt": "Türkiye nerede?",
+          "lat": 39.0,
+          "lng": 35.0
+        },
+        {
+          "id": "fr",
+          "prompt": "Fransa nerede?",
+          "lat": 46.2276,
+          "lng": 2.2137
+        }
+      ]
+    },
+    {
+      "id": "capitals",
+      "title": "Başkentler",
+      "type": "city",
+      "isLocked": false,
+      "questions": [
+        {
+          "id": "istanbul",
+          "prompt": "İstanbul nerede?",
+          "lat": 41.0082,
+          "lng": 28.9784
+        },
+        {
+          "id": "paris",
+          "prompt": "Eyfel Kulesi nerede?",
+          "lat": 48.8584,
+          "lng": 2.2945
+        }
+      ]
+    },
+    {
+      "id": "stadiums",
+      "title": "Futbol Stadyumları",
+      "type": "stadium",
+      "isLocked": true,
+      "questions": []
+    },
+    {
+      "id": "monuments",
+      "title": "Tarihi Eserler",
+      "type": "monument",
+      "isLocked": true,
+      "questions": []
+    },
+    {
+      "id": "movies",
+      "title": "Film Lokasyonları",
+      "type": "movie",
+      "isLocked": true,
+      "questions": []
+    },
+    {
+      "id": "resorts",
+      "title": "Tatil Beldeleri",
+      "type": "resort",
+      "isLocked": true,
+      "questions": []
+    }
+  ]
+}
+
+

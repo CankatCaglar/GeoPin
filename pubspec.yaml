@@ -1,0 +1,35 @@
+name: geo_quiz_master
+description: GeoQuiz Master - Nerede tarzı harita tabanlı trivia oyunu.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  flutter_riverpod: ^2.5.1
+  shared_preferences: ^2.3.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/categories.json
+
+
