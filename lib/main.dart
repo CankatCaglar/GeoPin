@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'stat_card.dart';
 
 void main() {
   runApp(const ProviderScope(child: GeoPinApp()));
@@ -68,6 +69,7 @@ class Question {
 // SABİT KATEGORİLER (ileride JSON'dan okunacak)
 final categoriesProvider = Provider<List<Category>>((ref) {
   return [
+    // 1) Tourist Places
     Category(
       id: 'tourist_places',
       title: 'Tourist Places',
@@ -75,6 +77,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: false,
       backgroundImage: 'assets/images/tourist_places.jpg',
     ),
+    // 2) Countries
     Category(
       id: 'countries',
       title: 'Countries',
@@ -82,6 +85,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: false,
       backgroundImage: 'assets/images/countries.jpg',
     ),
+    // 3) Capitals
     Category(
       id: 'capitals',
       title: 'Capitals',
@@ -89,13 +93,71 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: false,
       backgroundImage: 'assets/images/capitals.jpg',
     ),
+    // 4) Historical Landmarks (eski Historical Monuments, kilitsiz)
     Category(
-      id: 'cities',
-      title: 'Cities',
-      icon: Icons.apartment,
+      id: 'monuments',
+      title: 'Historical Landmarks',
+      icon: Icons.account_balance,
       isLocked: false,
-      backgroundImage: 'assets/images/cities.jpg',
+      backgroundImage: 'assets/images/monuments.jpg',
     ),
+    // 5) America
+    Category(
+      id: 'america',
+      title: 'America',
+      icon: Icons.public,
+      isLocked: false,
+      backgroundImage: 'assets/images/america.jpg',
+    ),
+    // 6) Europe
+    Category(
+      id: 'europe',
+      title: 'Europe',
+      icon: Icons.public,
+      isLocked: false,
+      backgroundImage: 'assets/images/europe.jpg',
+    ),
+    // 7) Asia
+    Category(
+      id: 'asia',
+      title: 'Asia',
+      icon: Icons.public,
+      isLocked: false,
+      backgroundImage: 'assets/images/asia.jpg',
+    ),
+    // 8) Africa
+    Category(
+      id: 'africa',
+      title: 'Africa',
+      icon: Icons.public,
+      isLocked: false,
+      backgroundImage: 'assets/images/africa.jpg',
+    ),
+    // 9) Oceania
+    Category(
+      id: 'oceania',
+      title: 'Oceania',
+      icon: Icons.public,
+      isLocked: false,
+      backgroundImage: 'assets/images/oceania.jpg',
+    ),
+    // 10) US States (buradan sonrası premium)
+    Category(
+      id: 'us_states',
+      title: 'US States',
+      icon: Icons.flag,
+      isLocked: true,
+      backgroundImage: 'assets/images/us_states.jpg',
+    ),
+    // 11) Natural Wonders
+    Category(
+      id: 'natural_wonders',
+      title: 'Natural Wonders',
+      icon: Icons.landscape,
+      isLocked: true,
+      backgroundImage: 'assets/images/natural_wonders.jpg',
+    ),
+    // 12) Football Stadiums (mevcut stadiums kategorisi)
     Category(
       id: 'stadiums',
       title: 'Football Stadiums',
@@ -103,26 +165,13 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: true,
       backgroundImage: 'assets/images/stadiums.jpg',
     ),
+    // 13) Famous Airports
     Category(
-      id: 'monuments',
-      title: 'Historical Monuments',
-      icon: Icons.account_balance,
+      id: 'airports',
+      title: 'Famous Airports',
+      icon: Icons.flight_takeoff,
       isLocked: true,
-      backgroundImage: 'assets/images/monuments.jpg',
-    ),
-    Category(
-      id: 'movies',
-      title: 'Movie Locations',
-      icon: Icons.movie,
-      isLocked: true,
-      backgroundImage: 'assets/images/movies.jpg',
-    ),
-    Category(
-      id: 'resorts',
-      title: 'Holiday Resorts',
-      icon: Icons.beach_access,
-      isLocked: true,
-      backgroundImage: 'assets/images/resorts.jpg',
+      backgroundImage: 'assets/images/airports.jpg',
     ),
   ];
 });
@@ -305,6 +354,10 @@ class CategoryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('GeoPin'),
         centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        surfaceTintColor: Colors.transparent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -381,52 +434,59 @@ class _CategoryCard extends ConsumerWidget {
         ),
         child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    category.icon,
-                    size: 40,
+            // Kategori etiketi - kartın sol kenarına gömülü mat etiket
+            Positioned(
+              top: 10,
+              left: 0,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  category.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
-                  Text(
-                    category.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             if (isLocked)
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.lock, size: 14, color: Colors.amber),
-                      SizedBox(width: 4),
-                      Text(
-                        'Premium',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.amber,
-                        ),
-                      ),
-                    ],
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E7D32),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.lock, size: 16, color: Colors.amber),
+                        if (category.id != 'monuments') ...[
+                          const SizedBox(width: 6),
+                          const Text(
+                            'Premium',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1389,6 +1449,149 @@ final questionsProvider = Provider<List<Question>>((ref) {
       lat: 0.3476,
       lng: 32.5825,
     ),
+  
+    // --- HISTORICAL LANDMARKS ---
+    // 20 easy but different landmarks (no overlap with Tourist Places)
+    Question(
+      id: 'blue_mosque',
+      categoryId: 'monuments',
+      prompt: 'Where is the Blue Mosque (Sultan Ahmed Mosque)?',
+      lat: 41.0054,
+      lng: 28.9768,
+    ),
+    Question(
+      id: 'hagia_sophia',
+      categoryId: 'monuments',
+      prompt: 'Where is Hagia Sophia?',
+      lat: 41.0086,
+      lng: 28.9802,
+    ),
+    Question(
+      id: 'kremlin_red_square',
+      categoryId: 'monuments',
+      prompt: 'Where are the Kremlin and Red Square?',
+      lat: 55.7539,
+      lng: 37.6208,
+    ),
+    Question(
+      id: 'tower_bridge',
+      categoryId: 'monuments',
+      prompt: 'Where is Tower Bridge?',
+      lat: 51.5055,
+      lng: -0.0754,
+    ),
+    Question(
+      id: 'buckingham_palace',
+      categoryId: 'monuments',
+      prompt: 'Where is Buckingham Palace?',
+      lat: 51.5014,
+      lng: -0.1419,
+    ),
+    Question(
+      id: 'cn_tower',
+      categoryId: 'monuments',
+      prompt: 'Where is the CN Tower?',
+      lat: 43.6426,
+      lng: -79.3871,
+    ),
+    Question(
+      id: 'gateway_arch',
+      categoryId: 'monuments',
+      prompt: 'Where is the Gateway Arch?',
+      lat: 38.6247,
+      lng: -90.1848,
+    ),
+    Question(
+      id: 'uluru',
+      categoryId: 'monuments',
+      prompt: 'Where is Uluru (Ayers Rock)?',
+      lat: -25.3444,
+      lng: 131.0369,
+    ),
+    Question(
+      id: 'mount_fuji',
+      categoryId: 'monuments',
+      prompt: 'Where is Mount Fuji?',
+      lat: 35.3606,
+      lng: 138.7274,
+    ),
+    Question(
+      id: 'table_mountain',
+      categoryId: 'monuments',
+      prompt: 'Where is Table Mountain?',
+      lat: -33.9628,
+      lng: 18.4098,
+    ),
+    Question(
+      id: 'matterhorn',
+      categoryId: 'monuments',
+      prompt: 'Where is the Matterhorn?',
+      lat: 45.9763,
+      lng: 7.6586,
+    ),
+    Question(
+      id: 'mont_saint_michel',
+      categoryId: 'monuments',
+      prompt: 'Where is Mont Saint-Michel?',
+      lat: 48.6360,
+      lng: -1.5115,
+    ),
+    Question(
+      id: 'blue_lagoon',
+      categoryId: 'monuments',
+      prompt: 'Where is the Blue Lagoon in Iceland?',
+      lat: 63.8804,
+      lng: -22.4495,
+    ),
+    Question(
+      id: 'alhambra',
+      categoryId: 'monuments',
+      prompt: 'Where is the Alhambra?',
+      lat: 37.1761,
+      lng: -3.5881,
+    ),
+    Question(
+      id: 'edinburgh_castle',
+      categoryId: 'monuments',
+      prompt: 'Where is Edinburgh Castle?',
+      lat: 55.9486,
+      lng: -3.1999,
+    ),
+    Question(
+      id: 'pisa_tower',
+      categoryId: 'monuments',
+      prompt: 'Where is the Leaning Tower of Pisa?',
+      lat: 43.7230,
+      lng: 10.3966,
+    ),
+    Question(
+      id: 'abu_simbel',
+      categoryId: 'monuments',
+      prompt: 'Where is Abu Simbel?',
+      lat: 22.3372,
+      lng: 31.6258,
+    ),
+    Question(
+      id: 'moai_easter_island',
+      categoryId: 'monuments',
+      prompt: 'Where are the Moai statues on Easter Island?',
+      lat: -27.1212,
+      lng: -109.3664,
+    ),
+    Question(
+      id: 'saint_basils',
+      categoryId: 'monuments',
+      prompt: "Where is Saint Basil's Cathedral?",
+      lat: 55.7525,
+      lng: 37.6231,
+    ),
+    Question(
+      id: 'himeji_castle',
+      categoryId: 'monuments',
+      prompt: 'Where is Himeji Castle?',
+      lat: 34.8394,
+      lng: 134.6939,
+    ),
   ];
 });
 
@@ -1658,10 +1861,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               // Kategori bazlı harita seçimi
               TileLayer(
                 urlTemplate: (widget.categoryId == 'countries' || widget.categoryId == 'capitals')
-                    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
-                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subdomains: const ['a', 'b', 'c'],
-                userAgentPackageName: 'com.example.geo_quiz_master',
+                    ? 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
+                    : 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.geopin',
+                maxZoom: 19,
+                minZoom: 1,
+                tileProvider: NetworkTileProvider(),
               ),
               // Kullanıcı tahmini ve gerçek hedef marker'ları
               MarkerLayer(
@@ -2169,7 +2374,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _StatCard(
+                      child: StatCard(
                         icon: Icons.quiz,
                         label: 'Questions',
                         value: '$totalQuestions',
@@ -2177,7 +2382,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _StatCard(
+                      child: StatCard(
                         icon: Icons.star,
                         label: 'Average',
                         value: (totalScore / totalQuestions).round().toString(),
@@ -2218,124 +2423,3 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 }
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.blue, size: 28),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.white70,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// BLINKING TEXT WIDGET
-class BlinkingText extends StatefulWidget {
-  final String text;
-  final Color color;
-  final double fontSize;
-
-  const BlinkingText({
-    super.key,
-    required this.text,
-    required this.color,
-    required this.fontSize,
-  });
-
-  @override
-  State<BlinkingText> createState() => _BlinkingTextState();
-}
-
-class _BlinkingTextState extends State<BlinkingText>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1000), // Normal blinking speed
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.3,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-
-    _animationController.repeat(reverse: true); // Smooth blinking
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedBuilder(
-        animation: _fadeAnimation,
-        builder: (context, child) {
-          return Opacity(
-            opacity: _fadeAnimation.value,
-            child: Text(
-              widget.text,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: widget.color,
-                fontSize: widget.fontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-
