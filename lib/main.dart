@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'stat_card.dart';
+import 'america_button_game.dart';
 
 void main() {
   runApp(const ProviderScope(child: GeoPinApp()));
@@ -55,6 +56,8 @@ class Question {
     required this.prompt,
     required this.lat,
     required this.lng,
+    this.polygon,
+    this.isPolygonBased = false,
   });
 
   final String id;
@@ -62,6 +65,8 @@ class Question {
   final String prompt;
   final double lat;
   final double lng;
+  final List<LatLng>? polygon; // Ülke sınırları için polygon koordinatları
+  final bool isPolygonBased; // Polygon tabanlı soru mu?
 
   LatLng get location => LatLng(lat, lng);
 }
@@ -394,21 +399,30 @@ class _CategoryCard extends ConsumerWidget {
         if (isLocked) {
           _showPaywall(context, category);
         } else {
-          final questions = ref.read(questionsProvider);
-          // Filter questions for this category
-          final categoryQuestions = questions
-              .where((q) => q.categoryId == category.id)
-              .toList();
-              
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => GameScreen(
-                categoryId: category.id,
-                categoryTitle: category.title,
-                questions: categoryQuestions,
+          // America kategorisi için özel butonlu harita ekranını aç
+          if (category.id == 'america') {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const AmericaButtonGameScreen(),
               ),
-            ),
-          );
+            );
+          } else {
+            final questions = ref.read(questionsProvider);
+            // Filter questions for this category
+            final categoryQuestions = questions
+                .where((q) => q.categoryId == category.id)
+                .toList();
+            
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => GameScreen(
+                  categoryId: category.id,
+                  categoryTitle: category.title,
+                  questions: categoryQuestions,
+                ),
+              ),
+            );
+          }
         }
       },
       child: Ink(
@@ -1592,6 +1606,260 @@ final questionsProvider = Provider<List<Question>>((ref) {
       lat: 34.8394,
       lng: 134.6939,
     ),
+
+    // --- AMERICA (Polygon-based) ---
+    Question(
+      id: 'usa',
+      categoryId: 'america',
+      prompt: 'Where is the United States?',
+      lat: 39.8283,
+      lng: -98.5795,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(49.0, -125.0), // Northwest
+        LatLng(49.0, -66.0),  // Northeast
+        LatLng(25.0, -80.0),  // Southeast Florida
+        LatLng(25.0, -97.0),  // South Texas
+        LatLng(32.0, -117.0), // Southwest California
+        LatLng(49.0, -125.0), // Close polygon
+      ],
+    ),
+    Question(
+      id: 'alaska',
+      categoryId: 'america',
+      prompt: 'Where is Alaska?',
+      lat: 64.2008, // Alaska merkezi civarı
+      lng: -149.4937,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'canada',
+      categoryId: 'america',
+      prompt: 'Where is Canada?',
+      lat: 56.1304,
+      lng: -106.3468,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(83.0, -141.0), // Northwest Arctic
+        LatLng(83.0, -52.0),  // Northeast
+        LatLng(42.0, -52.0),  // Southeast
+        LatLng(49.0, -95.0),  // South central
+        LatLng(49.0, -123.0), // Southwest BC
+        LatLng(60.0, -141.0), // West Alaska border
+        LatLng(83.0, -141.0), // Close
+      ],
+    ),
+    Question(
+      id: 'mexico',
+      categoryId: 'america',
+      prompt: 'Where is Mexico?',
+      lat: 23.6345,
+      lng: -102.5528,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(32.0, -117.0), // Northwest Baja
+        LatLng(32.0, -97.0),  // Northeast Texas border
+        LatLng(25.0, -97.0),  // East coast
+        LatLng(18.0, -88.0),  // Yucatan
+        LatLng(14.5, -92.0),  // Guatemala border
+        LatLng(14.5, -118.0), // Southwest
+        LatLng(23.0, -110.0), // Baja south
+        LatLng(32.0, -117.0), // Close
+      ],
+    ),
+    Question(
+      id: 'brazil',
+      categoryId: 'america',
+      prompt: 'Where is Brazil?',
+      lat: -14.2350,
+      lng: -51.9253,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(5.0, -60.0),   // North Roraima
+        LatLng(5.0, -34.0),   // Northeast coast
+        LatLng(-33.0, -53.0), // South Rio Grande
+        LatLng(-33.0, -73.0), // Southwest border
+        LatLng(-10.0, -73.0), // West Acre
+        LatLng(5.0, -60.0),   // Close
+      ],
+    ),
+    Question(
+      id: 'argentina',
+      categoryId: 'america',
+      prompt: 'Where is Argentina?',
+      lat: -38.4161,
+      lng: -63.6167,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(-22.0, -65.0), // North border
+        LatLng(-22.0, -54.0), // Northeast
+        LatLng(-55.0, -66.0), // South Tierra del Fuego
+        LatLng(-55.0, -73.0), // Southwest
+        LatLng(-22.0, -69.0), // Northwest Chile border
+        LatLng(-22.0, -65.0), // Close
+      ],
+    ),
+    Question(
+      id: 'colombia',
+      categoryId: 'america',
+      prompt: 'Where is Colombia?',
+      lat: 4.5709,
+      lng: -74.2973,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(12.0, -72.0),  // North Caribbean
+        LatLng(12.0, -66.0),  // Northeast Venezuela
+        LatLng(-4.0, -67.0),  // Southeast Amazon
+        LatLng(-4.0, -79.0),  // Southwest Ecuador
+        LatLng(1.0, -79.0),   // West Pacific
+        LatLng(12.0, -77.0),  // Northwest Panama
+        LatLng(12.0, -72.0),  // Close
+      ],
+    ),
+    Question(
+      id: 'chile',
+      categoryId: 'america',
+      prompt: 'Where is Chile?',
+      lat: -35.6751,
+      lng: -71.5430,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(-17.0, -70.0), // North
+        LatLng(-17.0, -66.0), // Northeast Bolivia
+        LatLng(-55.0, -68.0), // South
+        LatLng(-55.0, -75.0), // Southwest
+        LatLng(-17.0, -70.0), // Close
+      ],
+    ),
+    Question(
+      id: 'peru',
+      categoryId: 'america',
+      prompt: 'Where is Peru?',
+      lat: -9.1900,
+      lng: -75.0152,
+      isPolygonBased: true,
+      polygon: [
+        LatLng(-0.5, -75.0),  // North Ecuador
+        LatLng(-0.5, -70.0),  // Northeast Colombia
+        LatLng(-18.0, -69.0), // Southeast Bolivia
+        LatLng(-18.0, -76.0), // Southwest coast
+        LatLng(-0.5, -81.0),  // West Pacific
+        LatLng(-0.5, -75.0),  // Close
+      ],
+    ),
+    // Ek Amerika ülkeleri
+    Question(
+      id: 'belize',
+      categoryId: 'america',
+      prompt: 'Where is Belize?',
+      lat: 17.1899,
+      lng: -88.4976,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'costa_rica',
+      categoryId: 'america',
+      prompt: 'Where is Costa Rica?',
+      lat: 9.7489,
+      lng: -83.7534,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'el_salvador',
+      categoryId: 'america',
+      prompt: 'Where is El Salvador?',
+      lat: 13.7942,
+      lng: -88.8965,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'guatemala',
+      categoryId: 'america',
+      prompt: 'Where is Guatemala?',
+      lat: 15.7835,
+      lng: -90.2308,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'honduras',
+      categoryId: 'america',
+      prompt: 'Where is Honduras?',
+      lat: 15.1999,
+      lng: -86.2419,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'nicaragua',
+      categoryId: 'america',
+      prompt: 'Where is Nicaragua?',
+      lat: 12.8654,
+      lng: -85.2072,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'panama',
+      categoryId: 'america',
+      prompt: 'Where is Panama?',
+      lat: 8.5380,
+      lng: -80.7821,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'bolivia',
+      categoryId: 'america',
+      prompt: 'Where is Bolivia?',
+      lat: -16.2902,
+      lng: -63.5887,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'ecuador',
+      categoryId: 'america',
+      prompt: 'Where is Ecuador?',
+      lat: -1.8312,
+      lng: -78.1834,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'guyana',
+      categoryId: 'america',
+      prompt: 'Where is Guyana?',
+      lat: 4.8604,
+      lng: -58.9302,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'paraguay',
+      categoryId: 'america',
+      prompt: 'Where is Paraguay?',
+      lat: -23.4425,
+      lng: -58.4438,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'suriname',
+      categoryId: 'america',
+      prompt: 'Where is Suriname?',
+      lat: 3.9193,
+      lng: -56.0278,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'uruguay',
+      categoryId: 'america',
+      prompt: 'Where is Uruguay?',
+      lat: -32.5228,
+      lng: -55.7658,
+      isPolygonBased: true,
+    ),
+    Question(
+      id: 'venezuela',
+      categoryId: 'america',
+      prompt: 'Where is Venezuela?',
+      lat: 6.4238,
+      lng: -66.5897,
+      isPolygonBased: true,
+    ),
   ];
 });
 
@@ -1678,8 +1946,25 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
-  void calculateDistance() {
+  void calculateDistance({bool? isInsidePolygon}) {
     if (state.userGuess == null) return;
+    
+    final currentQuestion = state.questions[state.currentQuestionIndex];
+    
+    // Polygon-based sorular için
+    if (currentQuestion.isPolygonBased && isInsidePolygon != null) {
+      final score = isInsidePolygon ? 1000 : 0; // Doğru ülke = 1000, yanlış = 0
+      final newAnswers = Map<int, QuestionAnswer>.from(state.answers);
+      newAnswers[state.currentQuestionIndex] = QuestionAnswer(
+        userGuess: state.userGuess!,
+        distanceKm: 0, // Polygon-based'de mesafe önemli değil
+        score: score,
+      );
+      state = state.copyWith(answers: newAnswers);
+      return;
+    }
+    
+    // Normal point-based sorular için
     final distance = const Distance();
     final meters = distance(
       state.userGuess!,
@@ -1803,9 +2088,52 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
+  // Polygon içinde nokta kontrolü (Ray Casting Algorithm)
+  bool _isPointInPolygon(LatLng point, List<LatLng> polygon) {
+    int intersectCount = 0;
+    for (int i = 0; i < polygon.length; i++) {
+      LatLng vertex1 = polygon[i];
+      LatLng vertex2 = polygon[(i + 1) % polygon.length];
+
+      if (_rayCastIntersect(point, vertex1, vertex2)) {
+        intersectCount++;
+      }
+    }
+    return (intersectCount % 2) == 1; // Tek sayıda kesişim = içeride
+  }
+
+  bool _rayCastIntersect(LatLng point, LatLng vertexA, LatLng vertexB) {
+    double px = point.longitude;
+    double py = point.latitude;
+    double ax = vertexA.longitude;
+    double ay = vertexA.latitude;
+    double bx = vertexB.longitude;
+    double by = vertexB.latitude;
+
+    if (ay > by) {
+      ax = vertexB.longitude;
+      ay = vertexB.latitude;
+      bx = vertexA.longitude;
+      by = vertexA.latitude;
+    }
+
+    if (py == ay || py == by) py += 0.00000001;
+    if ((py > by || py < ay) || (px > (ax > bx ? ax : bx))) return false;
+    if (px < (ax < bx ? ax : bx)) return true;
+
+    double red = (py - ay) / (by - ay);
+    double blue = (px - ax) / (bx - ax);
+    return blue >= red;
+  }
+
   void _resetMapView() {
-    // Ülkeler kategorisinde haritayı resetleme - hile olmasın!
-    if (widget.categoryId == 'countries') {
+    // Ülkeler ve polygon-based kategorilerde haritayı resetleme - hile olmasın!
+    if (widget.categoryId == 'countries' || 
+        widget.categoryId == 'america' ||
+        widget.categoryId == 'europe' ||
+        widget.categoryId == 'asia' ||
+        widget.categoryId == 'africa' ||
+        widget.categoryId == 'oceania') {
       return;
     }
     
@@ -1815,8 +2143,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _zoomToAnswer() {
-    // Ülkeler kategorisinde otomatik zoom yapma - hile olmasın!
-    if (widget.categoryId == 'countries') {
+    // Ülkeler ve polygon-based kategorilerde otomatik zoom yapma - hile olmasın!
+    if (widget.categoryId == 'countries' || 
+        widget.categoryId == 'america' ||
+        widget.categoryId == 'europe' ||
+        widget.categoryId == 'asia' ||
+        widget.categoryId == 'africa' ||
+        widget.categoryId == 'oceania') {
       return;
     }
     
@@ -1831,11 +2164,32 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Widget build(BuildContext context) {
     final game = ref.watch(gameProvider(_gameParams));
 
-    // Haritanın başlangıç odağı: Ülkeler için dünya haritası, diğerleri için soru konumu
-    final center = widget.categoryId == 'countries' 
-        ? const LatLng(20, 0) // Dünyanın ortası
-        : game.target;
-    final initialZoom = widget.categoryId == 'countries' ? 2.0 : 4.0;
+    // Haritanın başlangıç odağı: Polygon-based kategoriler için kıta merkezleri
+    LatLng center;
+    double initialZoom;
+    
+    if (widget.categoryId == 'countries') {
+      center = const LatLng(20, 0); // Dünya
+      initialZoom = 2.0;
+    } else if (widget.categoryId == 'america') {
+      center = const LatLng(0, -80); // Amerika kıtası merkezi
+      initialZoom = 2.5;
+    } else if (widget.categoryId == 'europe') {
+      center = const LatLng(50, 15); // Avrupa merkezi
+      initialZoom = 3.5;
+    } else if (widget.categoryId == 'asia') {
+      center = const LatLng(30, 100); // Asya merkezi
+      initialZoom = 2.5;
+    } else if (widget.categoryId == 'africa') {
+      center = const LatLng(0, 20); // Afrika merkezi
+      initialZoom = 3.0;
+    } else if (widget.categoryId == 'oceania') {
+      center = const LatLng(-25, 135); // Okyanusya merkezi
+      initialZoom = 3.5;
+    } else {
+      center = game.target; // Normal sorular için hedef konum
+      initialZoom = 4.0;
+    }
 
     return Scaffold(
       body: Stack(
@@ -1860,7 +2214,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             children: [
               // Kategori bazlı harita seçimi
               TileLayer(
-                urlTemplate: (widget.categoryId == 'countries' || widget.categoryId == 'capitals')
+                urlTemplate: (widget.categoryId == 'countries' || 
+                             widget.categoryId == 'capitals' || 
+                             widget.categoryId == 'america' ||
+                             widget.categoryId == 'europe' ||
+                             widget.categoryId == 'asia' ||
+                             widget.categoryId == 'africa' ||
+                             widget.categoryId == 'oceania')
                     ? 'https://a.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
                     : 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.geopin',
@@ -1868,37 +2228,57 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 minZoom: 1,
                 tileProvider: NetworkTileProvider(),
               ),
-              // Kullanıcı tahmini ve gerçek hedef marker'ları
-              MarkerLayer(
-                markers: [
-                  // Kırmızı pin: Kullanıcının tahmini (henüz cevap verilmediyse userGuess, verildiyse currentAnswer'dan)
-                  if (game.userGuess != null || game.currentAnswer != null)
-                    Marker(
-                      point: game.currentAnswer?.userGuess ?? game.userGuess!,
-                      width: 40,
-                      height: 40,
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.redAccent,
-                        size: 32,
-                      ),
-                    ),
-                  // Yeşil pin: Doğru konum (sadece cevap verildikten sonra)
-                  if (game.hasAnswered)
-                    Marker(
+              // Polygon-based sorular için tıklanabilir ülke daireleri
+              if (game.currentQuestion.isPolygonBased)
+                CircleLayer(
+                  circles: [
+                    // Doğru ülkenin merkezi (her zaman göster)
+                    CircleMarker(
                       point: game.target,
-                      width: 40,
-                      height: 40,
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.greenAccent,
-                        size: 32,
-                      ),
+                      radius: 80,
+                      color: game.hasAnswered && game.currentAnswer?.score == 1000 
+                          ? Colors.green.withOpacity(0.4) 
+                          : Colors.blue.withOpacity(0.3),
+                      borderColor: game.hasAnswered && game.currentAnswer?.score == 1000 
+                          ? Colors.green 
+                          : Colors.blue,
+                      borderStrokeWidth: 3,
+                      useRadiusInMeter: false,
                     ),
-                ],
-              ),
-              // Çizgi: Kırmızı pin ile yeşil pin arası (pinlerin alt uçlarından birleşiyor)
-              if ((game.userGuess != null || game.currentAnswer != null) && game.hasAnswered)
+                  ],
+                ),
+              // Kullanıcı tahmini ve gerçek hedef marker'ları (sadece point-based sorular için)
+              if (!game.currentQuestion.isPolygonBased)
+                MarkerLayer(
+                  markers: [
+                    // Kırmızı pin: Kullanıcının tahmini (henüz cevap verilmediyse userGuess, verildiyse currentAnswer'dan)
+                    if (game.userGuess != null || game.currentAnswer != null)
+                      Marker(
+                        point: game.currentAnswer?.userGuess ?? game.userGuess!,
+                        width: 40,
+                        height: 40,
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.redAccent,
+                          size: 32,
+                        ),
+                      ),
+                    // Yeşil pin: Doğru konum (sadece cevap verildikten sonra)
+                    if (game.hasAnswered)
+                      Marker(
+                        point: game.target,
+                        width: 40,
+                        height: 40,
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.greenAccent,
+                          size: 32,
+                        ),
+                      ),
+                  ],
+                ),
+              // Çizgi: Kırmızı pin ile yeşil pin arası (sadece point-based sorular için)
+              if (!game.currentQuestion.isPolygonBased && (game.userGuess != null || game.currentAnswer != null) && game.hasAnswered)
                 PolylineLayer<Object>(
                   polylines: [
                     Polyline(
@@ -1911,8 +2291,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ],
                 ),
-              // Çizgi üzerine km yazısı (siyah yazı, arka plan yok)
-              if ((game.userGuess != null || game.currentAnswer != null) && game.hasAnswered && game.distanceKm != null)
+              // Çizgi üzerine km yazısı (sadece point-based sorular için)
+              if (!game.currentQuestion.isPolygonBased && (game.userGuess != null || game.currentAnswer != null) && game.hasAnswered && game.distanceKm != null)
                 MarkerLayer(
                   markers: [
                     Marker(
@@ -2096,9 +2476,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         elevation: 0,
                       ),
                       onPressed: () {
-                        ref
-                            .read(gameProvider(_gameParams).notifier)
-                            .calculateDistance();
+                        final currentQuestion = game.currentQuestion;
+                        
+                        // Polygon-based sorular için direkt daire kontrolü
+                        if (currentQuestion.isPolygonBased && game.userGuess != null) {
+                          // Kullanıcının tıkladığı nokta doğru daireyi hedefliyor mu?
+                          final distance = const Distance();
+                          final meters = distance(game.userGuess!, game.target);
+                          final km = meters / 1000.0;
+                          // Sadece dairenin tam merkezine yakın tıklama (50km içinde)
+                          final isCorrect = km <= 50;
+                          ref
+                              .read(gameProvider(_gameParams).notifier)
+                              .calculateDistance(isInsidePolygon: isCorrect);
+                        } else {
+                          // Normal point-based sorular için
+                          ref
+                              .read(gameProvider(_gameParams).notifier)
+                              .calculateDistance();
+                        }
+                        
                         _showResultDialog(context, ref);
                       },
                       child: const Text(
