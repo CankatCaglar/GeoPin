@@ -1102,6 +1102,293 @@ final questionsProvider = Provider<List<Question>>((ref) {
       lat: 40.3399,
       lng: 127.5101,
     ),
+
+    // --- CAPITALS ---
+    // EASY - Very famous capitals everyone knows
+    Question(
+      id: 'paris',
+      categoryId: 'capitals',
+      prompt: 'Where is Paris?',
+      lat: 48.8566,
+      lng: 2.3522,
+    ),
+    Question(
+      id: 'london',
+      categoryId: 'capitals',
+      prompt: 'Where is London?',
+      lat: 51.5074,
+      lng: -0.1278,
+    ),
+    Question(
+      id: 'washington',
+      categoryId: 'capitals',
+      prompt: 'Where is Washington D.C.?',
+      lat: 38.9072,
+      lng: -77.0369,
+    ),
+    Question(
+      id: 'tokyo',
+      categoryId: 'capitals',
+      prompt: 'Where is Tokyo?',
+      lat: 35.6762,
+      lng: 139.6503,
+    ),
+    Question(
+      id: 'moscow',
+      categoryId: 'capitals',
+      prompt: 'Where is Moscow?',
+      lat: 55.7558,
+      lng: 37.6173,
+    ),
+    Question(
+      id: 'beijing',
+      categoryId: 'capitals',
+      prompt: 'Where is Beijing?',
+      lat: 39.9042,
+      lng: 116.4074,
+    ),
+    Question(
+      id: 'rome',
+      categoryId: 'capitals',
+      prompt: 'Where is Rome?',
+      lat: 41.9028,
+      lng: 12.4964,
+    ),
+    Question(
+      id: 'berlin',
+      categoryId: 'capitals',
+      prompt: 'Where is Berlin?',
+      lat: 52.5200,
+      lng: 13.4050,
+    ),
+    Question(
+      id: 'madrid',
+      categoryId: 'capitals',
+      prompt: 'Where is Madrid?',
+      lat: 40.4168,
+      lng: -3.7038,
+    ),
+    Question(
+      id: 'cairo',
+      categoryId: 'capitals',
+      prompt: 'Where is Cairo?',
+      lat: 30.0444,
+      lng: 31.2357,
+    ),
+
+    // MEDIUM - Well-known capitals
+    Question(
+      id: 'ankara',
+      categoryId: 'capitals',
+      prompt: 'Where is Ankara?',
+      lat: 39.9334,
+      lng: 32.8597,
+    ),
+    Question(
+      id: 'vienna',
+      categoryId: 'capitals',
+      prompt: 'Where is Vienna?',
+      lat: 48.2082,
+      lng: 16.3738,
+    ),
+    Question(
+      id: 'athens',
+      categoryId: 'capitals',
+      prompt: 'Where is Athens?',
+      lat: 37.9838,
+      lng: 23.7275,
+    ),
+    Question(
+      id: 'stockholm',
+      categoryId: 'capitals',
+      prompt: 'Where is Stockholm?',
+      lat: 59.3293,
+      lng: 18.0686,
+    ),
+    Question(
+      id: 'oslo',
+      categoryId: 'capitals',
+      prompt: 'Where is Oslo?',
+      lat: 59.9139,
+      lng: 10.7522,
+    ),
+    Question(
+      id: 'copenhagen',
+      categoryId: 'capitals',
+      prompt: 'Where is Copenhagen?',
+      lat: 55.6761,
+      lng: 12.5683,
+    ),
+    Question(
+      id: 'warsaw',
+      categoryId: 'capitals',
+      prompt: 'Where is Warsaw?',
+      lat: 52.2297,
+      lng: 21.0122,
+    ),
+    Question(
+      id: 'prague',
+      categoryId: 'capitals',
+      prompt: 'Where is Prague?',
+      lat: 50.0755,
+      lng: 14.4378,
+    ),
+    Question(
+      id: 'budapest',
+      categoryId: 'capitals',
+      prompt: 'Where is Budapest?',
+      lat: 47.4979,
+      lng: 19.0402,
+    ),
+    Question(
+      id: 'lisbon',
+      categoryId: 'capitals',
+      prompt: 'Where is Lisbon?',
+      lat: 38.7223,
+      lng: -9.1393,
+    ),
+    Question(
+      id: 'dublin',
+      categoryId: 'capitals',
+      prompt: 'Where is Dublin?',
+      lat: 53.3498,
+      lng: -6.2603,
+    ),
+    Question(
+      id: 'brussels',
+      categoryId: 'capitals',
+      prompt: 'Where is Brussels?',
+      lat: 50.8503,
+      lng: 4.3517,
+    ),
+    Question(
+      id: 'amsterdam',
+      categoryId: 'capitals',
+      prompt: 'Where is Amsterdam?',
+      lat: 52.3676,
+      lng: 4.9041,
+    ),
+    Question(
+      id: 'canberra',
+      categoryId: 'capitals',
+      prompt: 'Where is Canberra?',
+      lat: -35.2809,
+      lng: 149.1300,
+    ),
+    Question(
+      id: 'wellington',
+      categoryId: 'capitals',
+      prompt: 'Where is Wellington?',
+      lat: -41.2865,
+      lng: 174.7762,
+    ),
+
+    // HARD - Lesser-known capitals
+    Question(
+      id: 'brasilia',
+      categoryId: 'capitals',
+      prompt: 'Where is Brasília?',
+      lat: -15.8267,
+      lng: -47.9218,
+    ),
+    Question(
+      id: 'ottawa',
+      categoryId: 'capitals',
+      prompt: 'Where is Ottawa?',
+      lat: 45.4215,
+      lng: -75.6972,
+    ),
+    Question(
+      id: 'bern',
+      categoryId: 'capitals',
+      prompt: 'Where is Bern?',
+      lat: 46.9480,
+      lng: 7.4474,
+    ),
+    Question(
+      id: 'nairobi',
+      categoryId: 'capitals',
+      prompt: 'Where is Nairobi?',
+      lat: -1.2864,
+      lng: 36.8172,
+    ),
+    Question(
+      id: 'hanoi',
+      categoryId: 'capitals',
+      prompt: 'Where is Hanoi?',
+      lat: 21.0285,
+      lng: 105.8542,
+    ),
+    Question(
+      id: 'manila',
+      categoryId: 'capitals',
+      prompt: 'Where is Manila?',
+      lat: 14.5995,
+      lng: 120.9842,
+    ),
+    Question(
+      id: 'santiago',
+      categoryId: 'capitals',
+      prompt: 'Where is Santiago?',
+      lat: -33.4489,
+      lng: -70.6693,
+    ),
+    Question(
+      id: 'lima',
+      categoryId: 'capitals',
+      prompt: 'Where is Lima?',
+      lat: -12.0464,
+      lng: -77.0428,
+    ),
+    Question(
+      id: 'bogota',
+      categoryId: 'capitals',
+      prompt: 'Where is Bogotá?',
+      lat: 4.7110,
+      lng: -74.0721,
+    ),
+    Question(
+      id: 'riyadh',
+      categoryId: 'capitals',
+      prompt: 'Where is Riyadh?',
+      lat: 24.7136,
+      lng: 46.6753,
+    ),
+    Question(
+      id: 'tehran',
+      categoryId: 'capitals',
+      prompt: 'Where is Tehran?',
+      lat: 35.6892,
+      lng: 51.3890,
+    ),
+    Question(
+      id: 'islamabad',
+      categoryId: 'capitals',
+      prompt: 'Where is Islamabad?',
+      lat: 33.6844,
+      lng: 73.0479,
+    ),
+    Question(
+      id: 'kathmandu',
+      categoryId: 'capitals',
+      prompt: 'Where is Kathmandu?',
+      lat: 27.7172,
+      lng: 85.3240,
+    ),
+    Question(
+      id: 'addis_ababa',
+      categoryId: 'capitals',
+      prompt: 'Where is Addis Ababa?',
+      lat: 9.0320,
+      lng: 38.7469,
+    ),
+    Question(
+      id: 'kampala',
+      categoryId: 'capitals',
+      prompt: 'Where is Kampala?',
+      lat: 0.3476,
+      lng: 32.5825,
+    ),
   ];
 });
 
@@ -1368,14 +1655,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               },
             ),
             children: [
-              // Ülkeler için renkli sınırlı ama etiketsiz harita, diğerleri için normal harita
+              // Kategori bazlı harita seçimi
               TileLayer(
-                urlTemplate: widget.categoryId == 'countries'
-                    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png'
+                urlTemplate: (widget.categoryId == 'countries' || widget.categoryId == 'capitals')
+                    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png'
                     : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subdomains: const ['a', 'b', 'c', 'd'],
+                subdomains: const ['a', 'b', 'c'],
                 userAgentPackageName: 'com.example.geo_quiz_master',
-                retinaMode: true,
               ),
               // Kullanıcı tahmini ve gerçek hedef marker'ları
               MarkerLayer(
@@ -1554,6 +1840,24 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           ],
                         ),
                       ),
+                      // Pusula butonu - Haritayı kuzeye çevir
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.explore),
+                          color: Colors.white,
+                          iconSize: 24,
+                          padding: const EdgeInsets.all(8),
+                          constraints: const BoxConstraints(),
+                          tooltip: 'Reset map orientation',
+                          onPressed: () {
+                            _mapController.rotate(0);
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -1564,7 +1868,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           Positioned(
             left: 16,
             right: 16,
-            bottom: 100,
+            bottom: 40,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1572,8 +1876,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   if (game.userGuess == null)
                     BlinkingText(
                       text: 'Tap on the map to select your guess point.',
-                      color: Colors.purple,
-                      fontSize: 16.0,
+                      color: Colors.green,
+                      fontSize: 18.0,
                     )
                   else
                     ElevatedButton(
