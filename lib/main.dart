@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'stat_card.dart';
+import 'background_music_service.dart';
 import 'america_button_game.dart';
 import 'europe_button_game.dart';
 import 'asia_button_game.dart';
@@ -24,6 +25,8 @@ class GeoPinApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Başlangıçta arka plan müziğini başlat
+    BackgroundMusicService.instance.play();
     return MaterialApp(
       title: 'GeoPin',
       debugShowCheckedModeBanner: false,
@@ -437,8 +440,142 @@ class SettingsScreen extends StatelessWidget {
         title: const Text('Settings'),
         centerTitle: true,
       ),
-      body: const Center(
-        child: Text('Settings will be implemented here.'),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: Text(
+              'General',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.workspace_premium, color: Colors.amber),
+            title: const Text('Upgrade to Premium'),
+            subtitle: const Text('Unlock all maps and premium content'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Premium upgrade coming soon.')),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: const Text('Language'),
+            subtitle: const Text('English'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Language settings coming soon.')),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          StatefulBuilder(
+            builder: (context, setState) {
+              bool musicOn = BackgroundMusicService.instance.isEnabled;
+              return SwitchListTile(
+                secondary: const Icon(Icons.music_note),
+                title: const Text('Music'),
+                subtitle: const Text('Background music on/off'),
+                value: musicOn,
+                onChanged: (value) async {
+                  HapticFeedback.selectionClick();
+                  await BackgroundMusicService.instance.setEnabled(value);
+                  setState(() {
+                    musicOn = value;
+                  });
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: Text(
+              'App',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.star_rate),
+            title: const Text('Rate App'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Rate App coming soon.')),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.share),
+            title: const Text('Share App'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Share App coming soon.')),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.email),
+            title: const Text('Contact Us'),
+            subtitle: const Text('support@geopin.app'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Contact flow coming soon.')),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: Text(
+              'Legal',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip),
+            title: const Text('Privacy Policy'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Privacy Policy coming soon.')),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.description),
+            title: const Text('Terms of Use'),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Terms of Use coming soon.')),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }
