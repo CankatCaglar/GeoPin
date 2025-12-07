@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -8,6 +9,8 @@ import 'europe_button_game.dart';
 import 'asia_button_game.dart';
 import 'africa_button_game.dart';
 import 'oceania_button_game.dart';
+import 'us_states_button_game.dart';
+import 'natural_wonders_button_game.dart';
 
 void main() {
   runApp(const ProviderScope(child: GeoPinApp()));
@@ -182,36 +185,76 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: false,
       backgroundImage: 'assets/images/oceania.jpg',
     ),
-    // 14) US States (buradan sonrası premium)
+    // 14) US States 1
     Category(
-      id: 'us_states',
-      title: 'US States',
+      id: 'us_states_1',
+      title: 'US States 1',
       icon: Icons.flag,
-      isLocked: true,
+      isLocked: false,
       backgroundImage: 'assets/images/us_states.jpg',
     ),
-    // 11) Natural Wonders
+    // 15) US States 2
     Category(
-      id: 'natural_wonders',
-      title: 'Natural Wonders',
+      id: 'us_states_2',
+      title: 'US States 2',
+      icon: Icons.flag,
+      isLocked: false,
+      backgroundImage: 'assets/images/us_states.jpg',
+    ),
+    // 11) Natural Wonders 1
+    Category(
+      id: 'natural_wonders_1',
+      title: 'Natural Wonders 1',
       icon: Icons.landscape,
-      isLocked: true,
+      isLocked: false,
       backgroundImage: 'assets/images/natural_wonders.jpg',
     ),
-    // 12) Football Stadiums (mevcut stadiums kategorisi)
+    // 12) Natural Wonders 2
+    Category(
+      id: 'natural_wonders_2',
+      title: 'Natural Wonders 2',
+      icon: Icons.landscape,
+      isLocked: false,
+      backgroundImage: 'assets/images/natural_wonders.jpg',
+    ),
+    // 13) Iconic Bridges
+    Category(
+      id: 'iconic_bridges',
+      title: 'Iconic Bridges',
+      icon: Icons.account_balance,
+      isLocked: false,
+      backgroundImage: 'assets/images/iconic_bridges.jpg',
+    ),
+    // 14) Tallest Skyscrapers
+    Category(
+      id: 'tallest_skyscrapers',
+      title: 'Tallest Skyscrapers',
+      icon: Icons.apartment,
+      isLocked: false,
+      backgroundImage: 'assets/images/tallest_skyscrapers.jpg',
+    ),
+    // 15) World Cuisine
+    Category(
+      id: 'world_cuisine',
+      title: 'World Cuisine',
+      icon: Icons.restaurant,
+      isLocked: false,
+      backgroundImage: 'assets/images/world_cuisine.jpg',
+    ),
+    // 16) Football Stadiums (mevcut stadiums kategorisi)
     Category(
       id: 'stadiums',
       title: 'Football Stadiums',
       icon: Icons.sports_soccer,
-      isLocked: true,
+      isLocked: false,
       backgroundImage: 'assets/images/stadiums.jpg',
     ),
-    // 13) Famous Airports
+    // 17) Famous Airports
     Category(
       id: 'airports',
       title: 'Famous Airports',
       icon: Icons.flight_takeoff,
-      isLocked: true,
+      isLocked: false,
       backgroundImage: 'assets/images/airports.jpg',
     ),
   ];
@@ -374,6 +417,30 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            Navigator.of(context).pop();
+          },
+        ),
+        title: const Text('Settings'),
+        centerTitle: true,
+      ),
+      body: const Center(
+        child: Text('Settings will be implemented here.'),
+      ),
+    );
+  }
+}
+
 // CATEGORY SCREEN
 
 class CategoryScreen extends ConsumerWidget {
@@ -391,22 +458,33 @@ class CategoryScreen extends ConsumerWidget {
         scrolledUnderElevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const SettingsScreen(),
+                ),
+              );
+            },
           ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final category = categories[index];
-            return _CategoryCard(category: category);
-          },
+        ],
+      ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1,
         ),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return _CategoryCard(category: category);
+        },
       ),
     );
   }
@@ -424,6 +502,7 @@ class _CategoryCard extends ConsumerWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
+        HapticFeedback.selectionClick();
         if (isLocked) {
           _showPaywall(context, category);
         } else {
@@ -469,6 +548,24 @@ class _CategoryCard extends ConsumerWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => const OceaniaButtonGameScreen(),
+              ),
+            );
+          } else if (category.id == 'us_states_1' || category.id == 'us_states_2') {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => UsStatesButtonGameScreen(
+                  title: category.title,
+                  part: category.id == 'us_states_1' ? 1 : 2,
+                ),
+              ),
+            );
+          } else if (category.id == 'natural_wonders_1' || category.id == 'natural_wonders_2') {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => NaturalWondersButtonGameScreen(
+                  title: category.title,
+                  part: category.id == 'natural_wonders_1' ? 1 : 2,
+                ),
               ),
             );
           } else {
@@ -953,6 +1050,640 @@ final questionsProvider = Provider<List<Question>>((ref) {
       prompt: 'Where is the Colosseum in Mexico City?',
       lat: 19.4326,
       lng: -99.1332,
+    ),
+
+    // --- NATURAL WONDERS (40 locations) ---
+    Question(
+      id: 'mount_everest',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Mount Everest?',
+      lat: 27.9881,
+      lng: 86.9250,
+    ),
+    Question(
+      id: 'niagara_falls',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are Niagara Falls?',
+      lat: 43.0962,
+      lng: -79.0377,
+    ),
+    Question(
+      id: 'grand_canyon',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Grand Canyon?',
+      lat: 36.1069,
+      lng: -112.1129,
+    ),
+    Question(
+      id: 'amazon_rainforest',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Amazon Rainforest?',
+      lat: -3.4653,
+      lng: -62.2159,
+    ),
+    Question(
+      id: 'sahara_desert',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Sahara Desert?',
+      lat: 23.4162,
+      lng: 25.6628,
+    ),
+    Question(
+      id: 'great_barrier_reef',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Great Barrier Reef?',
+      lat: -18.2871,
+      lng: 147.6992,
+    ),
+    Question(
+      id: 'mount_fuji',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Mount Fuji?',
+      lat: 35.3606,
+      lng: 138.7274,
+    ),
+    Question(
+      id: 'dead_sea',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Dead Sea?',
+      lat: 31.5590,
+      lng: 35.4732,
+    ),
+    Question(
+      id: 'maldives',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are the Maldives?',
+      lat: 3.2028,
+      lng: 73.2207,
+    ),
+    Question(
+      id: 'hawaii_natural',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Hawaii?',
+      lat: 19.8968,
+      lng: -155.5828,
+    ),
+    Question(
+      id: 'antarctica',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Antarctica?',
+      lat: -82.8628,
+      lng: 135.0000,
+    ),
+    Question(
+      id: 'loch_ness',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Loch Ness?',
+      lat: 57.3229,
+      lng: -4.4244,
+    ),
+    Question(
+      id: 'mount_kilimanjaro',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Mount Kilimanjaro?',
+      lat: -3.0674,
+      lng: 37.3556,
+    ),
+    Question(
+      id: 'victoria_falls',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are Victoria Falls?',
+      lat: -17.9243,
+      lng: 25.8560,
+    ),
+    Question(
+      id: 'galapagos_islands',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are the Galapagos Islands?',
+      lat: -0.9538,
+      lng: -90.9656,
+    ),
+    Question(
+      id: 'yellowstone',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Yellowstone National Park?',
+      lat: 44.4280,
+      lng: -110.5885,
+    ),
+    Question(
+      id: 'the_alps',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are the Alps?',
+      lat: 46.8876,
+      lng: 9.6570,
+    ),
+    Question(
+      id: 'black_forest',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Black Forest?',
+      lat: 48.0640,
+      lng: 8.2285,
+    ),
+    Question(
+      id: 'mount_etna',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Mount Etna?',
+      lat: 37.7510,
+      lng: 14.9934,
+    ),
+    Question(
+      id: 'santorini',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Santorini?',
+      lat: 36.3932,
+      lng: 25.4615,
+    ),
+    Question(
+      id: 'red_sea',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Red Sea?',
+      lat: 20.2802,
+      lng: 38.5126,
+    ),
+    Question(
+      id: 'caribbean_sea',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Caribbean Sea?',
+      lat: 15.3266,
+      lng: -75.0152,
+    ),
+    Question(
+      id: 'nile_river',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Nile River?',
+      lat: 19.0,
+      lng: 31.0,
+    ),
+    Question(
+      id: 'lake_victoria',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Lake Victoria?',
+      lat: -1.0,
+      lng: 33.0,
+    ),
+    Question(
+      id: 'madagascar',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Madagascar?',
+      lat: -18.7669,
+      lng: 46.8691,
+    ),
+    Question(
+      id: 'greenland',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Greenland?',
+      lat: 72.0000,
+      lng: -40.0000,
+    ),
+    Question(
+      id: 'iceland',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Iceland?',
+      lat: 64.9631,
+      lng: -19.0208,
+    ),
+    Question(
+      id: 'bali',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Bali?',
+      lat: -8.3405,
+      lng: 115.0920,
+    ),
+    Question(
+      id: 'mount_olympus',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Mount Olympus?',
+      lat: 40.0856,
+      lng: 22.3580,
+    ),
+    Question(
+      id: 'matterhorn',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the Matterhorn?',
+      lat: 45.9763,
+      lng: 7.6586,
+    ),
+    Question(
+      id: 'capri',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is the island of Capri?',
+      lat: 40.5532,
+      lng: 14.2222,
+    ),
+    Question(
+      id: 'pamukkale',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Pamukkale?',
+      lat: 37.9240,
+      lng: 29.1190,
+    ),
+    Question(
+      id: 'cappadocia',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Cappadocia?',
+      lat: 38.6431,
+      lng: 34.8310,
+    ),
+    Question(
+      id: 'dead_vlei',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Dead Vlei in the Namib Desert?',
+      lat: -24.7433,
+      lng: 15.2950,
+    ),
+    Question(
+      id: 'ha_long_bay',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Ha Long Bay?',
+      lat: 20.9101,
+      lng: 107.1839,
+    ),
+    Question(
+      id: 'lake_baikal',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Lake Baikal?',
+      lat: 53.5587,
+      lng: 108.1650,
+    ),
+    Question(
+      id: 'bora_bora',
+      categoryId: 'natural_wonders',
+      prompt: 'Where is Bora Bora?',
+      lat: -16.5004,
+      lng: -151.7415,
+    ),
+    Question(
+      id: 'seychelles_natural',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are the Seychelles?',
+      lat: -4.6796,
+      lng: 55.4920,
+    ),
+    Question(
+      id: 'canary_islands',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are the Canary Islands?',
+      lat: 28.2936,
+      lng: -16.6214,
+    ),
+    Question(
+      id: 'rocky_mountains',
+      categoryId: 'natural_wonders',
+      prompt: 'Where are the Rocky Mountains?',
+      lat: 39.1178,
+      lng: -106.4454,
+    ),
+
+    // --- US STATES (50 states, Alaska & Hawaii dahil) ---
+    Question(
+      id: 'us_alabama',
+      categoryId: 'us_states',
+      prompt: 'Where is Alabama?',
+      lat: 32.8067,
+      lng: -86.7911,
+    ),
+    Question(
+      id: 'us_alaska',
+      categoryId: 'us_states',
+      prompt: 'Where is Alaska?',
+      lat: 64.2008,
+      lng: -149.4937,
+    ),
+    Question(
+      id: 'us_arizona',
+      categoryId: 'us_states',
+      prompt: 'Where is Arizona?',
+      lat: 34.0489,
+      lng: -111.0937,
+    ),
+    Question(
+      id: 'us_arkansas',
+      categoryId: 'us_states',
+      prompt: 'Where is Arkansas?',
+      lat: 35.2010,
+      lng: -91.8318,
+    ),
+    Question(
+      id: 'us_california',
+      categoryId: 'us_states',
+      prompt: 'Where is California?',
+      lat: 36.7783,
+      lng: -119.4179,
+    ),
+    Question(
+      id: 'us_colorado',
+      categoryId: 'us_states',
+      prompt: 'Where is Colorado?',
+      lat: 39.5501,
+      lng: -105.7821,
+    ),
+    Question(
+      id: 'us_connecticut',
+      categoryId: 'us_states',
+      prompt: 'Where is Connecticut?',
+      lat: 41.6032,
+      lng: -73.0877,
+    ),
+    Question(
+      id: 'us_delaware',
+      categoryId: 'us_states',
+      prompt: 'Where is Delaware?',
+      lat: 38.9108,
+      lng: -75.5277,
+    ),
+    Question(
+      id: 'us_florida',
+      categoryId: 'us_states',
+      prompt: 'Where is Florida?',
+      lat: 27.6648,
+      lng: -81.5158,
+    ),
+    Question(
+      id: 'us_georgia',
+      categoryId: 'us_states',
+      prompt: 'Where is Georgia (US)?',
+      lat: 32.1656,
+      lng: -82.9001,
+    ),
+    Question(
+      id: 'us_hawaii',
+      categoryId: 'us_states',
+      prompt: 'Where is Hawaii?',
+      lat: 19.8968,
+      lng: -155.5828,
+    ),
+    Question(
+      id: 'us_idaho',
+      categoryId: 'us_states',
+      prompt: 'Where is Idaho?',
+      lat: 44.0682,
+      lng: -114.7420,
+    ),
+    Question(
+      id: 'us_illinois',
+      categoryId: 'us_states',
+      prompt: 'Where is Illinois?',
+      lat: 40.6331,
+      lng: -89.3985,
+    ),
+    Question(
+      id: 'us_indiana',
+      categoryId: 'us_states',
+      prompt: 'Where is Indiana?',
+      lat: 40.2672,
+      lng: -86.1349,
+    ),
+    Question(
+      id: 'us_iowa',
+      categoryId: 'us_states',
+      prompt: 'Where is Iowa?',
+      lat: 41.8780,
+      lng: -93.0977,
+    ),
+    Question(
+      id: 'us_kansas',
+      categoryId: 'us_states',
+      prompt: 'Where is Kansas?',
+      lat: 39.0119,
+      lng: -98.4842,
+    ),
+    Question(
+      id: 'us_kentucky',
+      categoryId: 'us_states',
+      prompt: 'Where is Kentucky?',
+      lat: 37.8393,
+      lng: -84.2700,
+    ),
+    Question(
+      id: 'us_louisiana',
+      categoryId: 'us_states',
+      prompt: 'Where is Louisiana?',
+      lat: 31.2448,
+      lng: -92.1450,
+    ),
+    Question(
+      id: 'us_maine',
+      categoryId: 'us_states',
+      prompt: 'Where is Maine?',
+      lat: 45.2538,
+      lng: -69.4455,
+    ),
+    Question(
+      id: 'us_maryland',
+      categoryId: 'us_states',
+      prompt: 'Where is Maryland?',
+      lat: 39.0458,
+      lng: -76.6413,
+    ),
+    Question(
+      id: 'us_massachusetts',
+      categoryId: 'us_states',
+      prompt: 'Where is Massachusetts?',
+      lat: 42.4072,
+      lng: -71.3824,
+    ),
+    Question(
+      id: 'us_michigan',
+      categoryId: 'us_states',
+      prompt: 'Where is Michigan?',
+      lat: 44.3148,
+      lng: -85.6024,
+    ),
+    Question(
+      id: 'us_minnesota',
+      categoryId: 'us_states',
+      prompt: 'Where is Minnesota?',
+      lat: 46.7296,
+      lng: -94.6859,
+    ),
+    Question(
+      id: 'us_mississippi',
+      categoryId: 'us_states',
+      prompt: 'Where is Mississippi?',
+      lat: 32.3547,
+      lng: -89.3985,
+    ),
+    Question(
+      id: 'us_missouri',
+      categoryId: 'us_states',
+      prompt: 'Where is Missouri?',
+      lat: 37.9643,
+      lng: -91.8318,
+    ),
+    Question(
+      id: 'us_montana',
+      categoryId: 'us_states',
+      prompt: 'Where is Montana?',
+      lat: 46.8797,
+      lng: -110.3626,
+    ),
+    Question(
+      id: 'us_nebraska',
+      categoryId: 'us_states',
+      prompt: 'Where is Nebraska?',
+      lat: 41.4925,
+      lng: -99.9018,
+    ),
+    Question(
+      id: 'us_nevada',
+      categoryId: 'us_states',
+      prompt: 'Where is Nevada?',
+      lat: 38.8026,
+      lng: -116.4194,
+    ),
+    Question(
+      id: 'us_new_hampshire',
+      categoryId: 'us_states',
+      prompt: 'Where is New Hampshire?',
+      lat: 43.1939,
+      lng: -71.5724,
+    ),
+    Question(
+      id: 'us_new_jersey',
+      categoryId: 'us_states',
+      prompt: 'Where is New Jersey?',
+      lat: 40.0583,
+      lng: -74.4057,
+    ),
+    Question(
+      id: 'us_new_mexico',
+      categoryId: 'us_states',
+      prompt: 'Where is New Mexico?',
+      lat: 34.5199,
+      lng: -105.8701,
+    ),
+    Question(
+      id: 'us_new_york',
+      categoryId: 'us_states',
+      prompt: 'Where is New York (state)?',
+      lat: 43.2994,
+      lng: -74.2179,
+    ),
+    Question(
+      id: 'us_north_carolina',
+      categoryId: 'us_states',
+      prompt: 'Where is North Carolina?',
+      lat: 35.7596,
+      lng: -79.0193,
+    ),
+    Question(
+      id: 'us_north_dakota',
+      categoryId: 'us_states',
+      prompt: 'Where is North Dakota?',
+      lat: 47.5515,
+      lng: -101.0020,
+    ),
+    Question(
+      id: 'us_ohio',
+      categoryId: 'us_states',
+      prompt: 'Where is Ohio?',
+      lat: 40.4173,
+      lng: -82.9071,
+    ),
+    Question(
+      id: 'us_oklahoma',
+      categoryId: 'us_states',
+      prompt: 'Where is Oklahoma?',
+      lat: 35.4676,
+      lng: -97.5164,
+    ),
+    Question(
+      id: 'us_oregon',
+      categoryId: 'us_states',
+      prompt: 'Where is Oregon?',
+      lat: 43.8041,
+      lng: -120.5542,
+    ),
+    Question(
+      id: 'us_pennsylvania',
+      categoryId: 'us_states',
+      prompt: 'Where is Pennsylvania?',
+      lat: 41.2033,
+      lng: -77.1945,
+    ),
+    Question(
+      id: 'us_rhode_island',
+      categoryId: 'us_states',
+      prompt: 'Where is Rhode Island?',
+      lat: 41.5801,
+      lng: -71.4774,
+    ),
+    Question(
+      id: 'us_south_carolina',
+      categoryId: 'us_states',
+      prompt: 'Where is South Carolina?',
+      lat: 33.8361,
+      lng: -81.1637,
+    ),
+    Question(
+      id: 'us_south_dakota',
+      categoryId: 'us_states',
+      prompt: 'Where is South Dakota?',
+      lat: 43.9695,
+      lng: -99.9018,
+    ),
+    Question(
+      id: 'us_tennessee',
+      categoryId: 'us_states',
+      prompt: 'Where is Tennessee?',
+      lat: 35.5175,
+      lng: -86.5804,
+    ),
+    Question(
+      id: 'us_texas',
+      categoryId: 'us_states',
+      prompt: 'Where is Texas?',
+      lat: 31.9686,
+      lng: -99.9018,
+    ),
+    Question(
+      id: 'us_utah',
+      categoryId: 'us_states',
+      prompt: 'Where is Utah?',
+      lat: 39.3210,
+      lng: -111.0937,
+    ),
+    Question(
+      id: 'us_vermont',
+      categoryId: 'us_states',
+      prompt: 'Where is Vermont?',
+      lat: 44.5588,
+      lng: -72.5778,
+    ),
+    Question(
+      id: 'us_virginia',
+      categoryId: 'us_states',
+      prompt: 'Where is Virginia?',
+      lat: 37.4316,
+      lng: -78.6569,
+    ),
+    Question(
+      id: 'us_washington',
+      categoryId: 'us_states',
+      prompt: 'Where is Washington (state)?',
+      lat: 47.7511,
+      lng: -120.7401,
+    ),
+    Question(
+      id: 'us_west_virginia',
+      categoryId: 'us_states',
+      prompt: 'Where is West Virginia?',
+      lat: 38.5976,
+      lng: -80.4549,
+    ),
+    Question(
+      id: 'us_wisconsin',
+      categoryId: 'us_states',
+      prompt: 'Where is Wisconsin?',
+      lat: 43.7844,
+      lng: -88.7879,
+    ),
+    Question(
+      id: 'us_wyoming',
+      categoryId: 'us_states',
+      prompt: 'Where is Wyoming?',
+      lat: 43.0759,
+      lng: -107.2903,
     ),
 
     // --- COUNTRIES --- (removed)
@@ -3330,6 +4061,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 flags: InteractiveFlag.all,
               ),
               onTap: (tapPosition, point) {
+                HapticFeedback.selectionClick();
                 if (!game.hasAnswered) {
                   ref.read(gameProvider(_gameParams).notifier).setUserGuess(point);
                 }
@@ -3488,7 +4220,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           iconSize: 20,
                           padding: const EdgeInsets.all(8),
                           constraints: const BoxConstraints(),
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.of(context).pop();
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -3563,6 +4298,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           constraints: const BoxConstraints(),
                           tooltip: 'Reset map orientation',
                           onPressed: () {
+                            HapticFeedback.selectionClick();
                             _mapController.rotate(0);
                           },
                         ),
@@ -3600,6 +4336,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         elevation: 0,
                       ),
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         final currentQuestion = game.currentQuestion;
                         
                         // Polygon-based sorular için direkt daire kontrolü
@@ -3645,6 +4382,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               ),
                             ),
                             onPressed: () {
+                              HapticFeedback.selectionClick();
                               ref
                                   .read(gameProvider(_gameParams).notifier)
                                   .previousQuestion();
@@ -3669,6 +4407,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             elevation: 0,
                           ),
                           onPressed: () {
+                            HapticFeedback.lightImpact();
                             if (game.isLastQuestion) {
                               // Tüm sorular bitince sonuç ekranını göster
                               if (game.allQuestionsAnswered) {
@@ -3712,7 +4451,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     // Auto-zoom to answer location
     _zoomToAnswer();
 
-    showDialog<void>(      context: context,
+    showDialog<void>(
+      context: context,
       barrierColor: Colors.black.withOpacity(0.42),
       builder: (context) {
         return Dialog(
@@ -3775,6 +4515,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       ),
                     ),
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Navigator.of(context).pop();
                     },
                     child: const Text('Close'),
@@ -3924,6 +4665,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       ),
                     ),
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Navigator.of(context).pop(); // Dialog'u kapat
                       Navigator.of(context).pop(); // GameScreen'den çık
                     },

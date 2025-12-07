@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -86,6 +87,7 @@ class _AmericaButtonGameScreenState extends ConsumerState<AmericaButtonGameScree
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         Navigator.of(context).pop(); // CategoryScreen'e dön
                       },
                       style: ElevatedButton.styleFrom(
@@ -147,6 +149,7 @@ class _AmericaButtonGameScreenState extends ConsumerState<AmericaButtonGameScree
                   flags: InteractiveFlag.all,
                 ),
                 onTap: (tapPosition, point) {
+                  HapticFeedback.selectionClick();
                   // En yakın butonu bul ve seç
                   if (visibleCountries.isEmpty) return;
                   final Distance distance = const Distance();
@@ -224,6 +227,7 @@ class _AmericaButtonGameScreenState extends ConsumerState<AmericaButtonGameScree
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  HapticFeedback.lightImpact();
                   if (_selectedCountryId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Tap on a circle to answer.')),

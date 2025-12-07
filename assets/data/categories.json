@@ -1,72 +1,52 @@
 {
   "categories": [
     {
-      "id": "countries",
-      "title": "Ülkeler",
-      "type": "country",
-      "isLocked": false,
+      "id": "natural_wonders",
+      "title": "Natural Wonders",
+      "type": "natural_wonder",
+      "isLocked": true,
       "questions": [
-        {
-          "id": "tr",
-          "prompt": "Türkiye nerede?",
-          "lat": 39.0,
-          "lng": 35.0
-        },
-        {
-          "id": "fr",
-          "prompt": "Fransa nerede?",
-          "lat": 46.2276,
-          "lng": 2.2137
-        }
+        { "id": "mount_everest", "prompt": "Where is Mount Everest?", "lat": 27.9881, "lng": 86.9250 },
+        { "id": "niagara_falls", "prompt": "Where are Niagara Falls?", "lat": 43.0962, "lng": -79.0377 },
+        { "id": "grand_canyon", "prompt": "Where is the Grand Canyon?", "lat": 36.1069, "lng": -112.1129 },
+        { "id": "amazon_rainforest", "prompt": "Where is the Amazon Rainforest?", "lat": -3.4653, "lng": -62.2159 },
+        { "id": "sahara_desert", "prompt": "Where is the Sahara Desert?", "lat": 23.4162, "lng": 25.6628 },
+        { "id": "great_barrier_reef", "prompt": "Where is the Great Barrier Reef?", "lat": -18.2871, "lng": 147.6992 },
+        { "id": "mount_fuji", "prompt": "Where is Mount Fuji?", "lat": 35.3606, "lng": 138.7274 },
+        { "id": "dead_sea", "prompt": "Where is the Dead Sea?", "lat": 31.5590, "lng": 35.4732 },
+        { "id": "maldives", "prompt": "Where are the Maldives?", "lat": 3.2028, "lng": 73.2207 },
+        { "id": "hawaii", "prompt": "Where is Hawaii?", "lat": 19.8968, "lng": -155.5828 },
+        { "id": "antarctica", "prompt": "Where is Antarctica?", "lat": -82.8628, "lng": 135.0000 },
+        { "id": "loch_ness", "prompt": "Where is Loch Ness?", "lat": 57.3229, "lng": -4.4244 },
+        { "id": "mount_kilimanjaro", "prompt": "Where is Mount Kilimanjaro?", "lat": -3.0674, "lng": 37.3556 },
+        { "id": "victoria_falls", "prompt": "Where are Victoria Falls?", "lat": -17.9243, "lng": 25.8560 },
+        { "id": "galapagos_islands", "prompt": "Where are the Galapagos Islands?", "lat": -0.9538, "lng": -90.9656 },
+        { "id": "yellowstone", "prompt": "Where is Yellowstone National Park?", "lat": 44.4280, "lng": -110.5885 },
+        { "id": "the_alps", "prompt": "Where are the Alps?", "lat": 46.8876, "lng": 9.6570 },
+        { "id": "black_forest", "prompt": "Where is the Black Forest?", "lat": 48.0640, "lng": 8.2285 },
+        { "id": "mount_etna", "prompt": "Where is Mount Etna?", "lat": 37.7510, "lng": 14.9934 },
+        { "id": "santorini", "prompt": "Where is Santorini?", "lat": 36.3932, "lng": 25.4615 },
+        { "id": "red_sea", "prompt": "Where is the Red Sea?", "lat": 20.2802, "lng": 38.5126 },
+        { "id": "caribbean_sea", "prompt": "Where is the Caribbean Sea?", "lat": 15.3266, "lng": -75.0152 },
+        { "id": "nile_river", "prompt": "Where is the Nile River?", "lat": 19.0, "lng": 31.0 },
+        { "id": "lake_victoria", "prompt": "Where is Lake Victoria?", "lat": -1.0, "lng": 33.0 },
+        { "id": "madagascar", "prompt": "Where is Madagascar?", "lat": -18.7669, "lng": 46.8691 },
+        { "id": "greenland", "prompt": "Where is Greenland?", "lat": 72.0000, "lng": -40.0000 },
+        { "id": "iceland", "prompt": "Where is Iceland?", "lat": 64.9631, "lng": -19.0208 },
+        { "id": "bali", "prompt": "Where is Bali?", "lat": -8.3405, "lng": 115.0920 },
+        { "id": "mount_olympus", "prompt": "Where is Mount Olympus?", "lat": 40.0856, "lng": 22.3580 },
+        { "id": "matterhorn", "prompt": "Where is the Matterhorn?", "lat": 45.9763, "lng": 7.6586 },
+        { "id": "capri", "prompt": "Where is the island of Capri?", "lat": 40.5532, "lng": 14.2222 },
+        { "id": "pamukkale", "prompt": "Where is Pamukkale?", "lat": 37.9240, "lng": 29.1190 },
+        { "id": "cappadocia", "prompt": "Where is Cappadocia?", "lat": 38.6431, "lng": 34.8310 },
+        { "id": "dead_vlei", "prompt": "Where is Dead Vlei in the Namib Desert?", "lat": -24.7433, "lng": 15.2950 },
+        { "id": "ha_long_bay", "prompt": "Where is Ha Long Bay?", "lat": 20.9101, "lng": 107.1839 },
+        { "id": "lake_baikal", "prompt": "Where is Lake Baikal?", "lat": 53.5587, "lng": 108.1650 },
+        { "id": "bora_bora", "prompt": "Where is Bora Bora?", "lat": -16.5004, "lng": -151.7415 },
+        { "id": "seychelles", "prompt": "Where are the Seychelles?", "lat": -4.6796, "lng": 55.4920 },
+        { "id": "canary_islands", "prompt": "Where are the Canary Islands?", "lat": 28.2936, "lng": -16.6214 },
+        { "id": "rocky_mountains", "prompt": "Where are the Rocky Mountains?", "lat": 39.1178, "lng": -106.4454 }
       ]
-    },
-    {
-      "id": "capitals",
-      "title": "Başkentler",
-      "type": "city",
-      "isLocked": false,
-      "questions": [
-        {
-          "id": "istanbul",
-          "prompt": "İstanbul nerede?",
-          "lat": 41.0082,
-          "lng": 28.9784
-        },
-        {
-          "id": "paris",
-          "prompt": "Eyfel Kulesi nerede?",
-          "lat": 48.8584,
-          "lng": 2.2945
-        }
-      ]
-    },
-    {
-      "id": "stadiums",
-      "title": "Futbol Stadyumları",
-      "type": "stadium",
-      "isLocked": true,
-      "questions": []
-    },
-    {
-      "id": "monuments",
-      "title": "Tarihi Eserler",
-      "type": "monument",
-      "isLocked": true,
-      "questions": []
-    },
-    {
-      "id": "movies",
-      "title": "Film Lokasyonları",
-      "type": "movie",
-      "isLocked": true,
-      "questions": []
-    },
-    {
-      "id": "resorts",
-      "title": "Tatil Beldeleri",
-      "type": "resort",
-      "isLocked": true,
-      "questions": []
     }
   ]
 }

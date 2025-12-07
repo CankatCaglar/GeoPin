@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -93,6 +94,7 @@ class _AsiaButtonGameScreenState extends ConsumerState<AsiaButtonGameScreen> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
@@ -150,6 +152,7 @@ class _AsiaButtonGameScreenState extends ConsumerState<AsiaButtonGameScreen> {
                   flags: InteractiveFlag.all,
                 ),
                 onTap: (tapPosition, point) {
+                  HapticFeedback.selectionClick();
                   if (visibleCountries.isEmpty) return;
                   final Distance distance = const Distance();
                   Question? nearest;
@@ -224,6 +227,7 @@ class _AsiaButtonGameScreenState extends ConsumerState<AsiaButtonGameScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  HapticFeedback.lightImpact();
                   if (_selectedCountryId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Tap on a circle to answer.')),

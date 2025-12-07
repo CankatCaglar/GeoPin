@@ -4,35 +4,42 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-import 'main.dart' show questionsProvider, Question; // Question ve questionsProvider kullanımı
+import 'main.dart' show questionsProvider, Question;
 
-class EuropeButtonGameScreen extends ConsumerStatefulWidget {
-  const EuropeButtonGameScreen({super.key, required this.categoryId, required this.title});
+class NaturalWondersButtonGameScreen extends ConsumerStatefulWidget {
+  const NaturalWondersButtonGameScreen({super.key, required this.title, required this.part});
 
-  final String categoryId; // 'europe_1' veya 'europe_2'
-  final String title;
+  final String title; // 'Natural Wonders 1' veya 'Natural Wonders 2'
+  final int part; // 1 veya 2
 
   @override
-  ConsumerState<EuropeButtonGameScreen> createState() => _EuropeButtonGameScreenState();
+  ConsumerState<NaturalWondersButtonGameScreen> createState() => _NaturalWondersButtonGameScreenState();
 }
 
-class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen> {
+class _NaturalWondersButtonGameScreenState extends ConsumerState<NaturalWondersButtonGameScreen> {
   final MapController _mapController = MapController();
 
   int _currentIndex = 0;
-  final Set<String> _answeredIds = {}; // Doğru bilinen ülkeler
-  String? _selectedCountryId;
+  final Set<String> _answeredIds = {}; // Doğru bilinen noktalar
+  String? _selectedId;
 
   @override
   Widget build(BuildContext context) {
     final allQuestions = ref.watch(questionsProvider);
-    // İlgili Europe kategorisindeki tüm sorular
-    final europeQuestions = allQuestions
-        .where((q) => q.categoryId == widget.categoryId)
-        .toList();
-    final totalQuestions = europeQuestions.length;
+    final allNaturalQuestions =
+        allQuestions.where((q) => q.categoryId == 'natural_wonders').toList();
 
-    // Tüm ülkeler doğru cevaplandı mı?
+    // 40 soruyu iki parçaya böl
+    final mid = (allNaturalQuestions.length / 2).ceil();
+    final List<Question> wondersQuestions;
+    if (widget.part == 1) {
+      wondersQuestions = allNaturalQuestions.sublist(0, mid);
+    } else {
+      wondersQuestions = allNaturalQuestions.sublist(mid);
+    }
+
+    final totalQuestions = wondersQuestions.length;
+
     if (_answeredIds.length >= totalQuestions) {
       return Scaffold(
         body: Container(
@@ -69,7 +76,7 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 32.0),
                         child: Text(
-                          'You found all the countries in this part of Europe. Nice job explorer!',
+                          'You found all these natural wonders. Nice job explorer!',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white70,
@@ -87,7 +94,7 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                     child: ElevatedButton.icon(
                       onPressed: () {
                         HapticFeedback.lightImpact();
-                        Navigator.of(context).pop(); // CategoryScreen'e dön
+                        Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -115,16 +122,14 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
       );
     }
 
-    final currentQuestion = europeQuestions[_currentIndex];
+    final currentQuestion = wondersQuestions[_currentIndex];
 
-    // Harita Avrupa kıtasına sabit bakıyor
-    const center = LatLng(50, 15);
-    const initialZoom = 3.5;
+    // Dünya genelini gösterecek merkez
+    const center = LatLng(20.0, 0.0);
+    const initialZoom = 1.8;
 
-    // Ekranda gösterilecek buton daireleri: sadece henüz doğru bilinmemiş ülkeler
-    final visibleCountries = europeQuestions
-        .where((q) => !_answeredIds.contains(q.id))
-        .toList();
+    final visibleQuestions =
+        wondersQuestions.where((q) => !_answeredIds.contains(q.id)).toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -134,26 +139,24 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
       ),
       body: Stack(
         children: [
-          // Harita tüm alanı doldurur
           Positioned.fill(
             child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
                 initialCenter: center,
                 initialZoom: initialZoom,
-                minZoom: 2,
+                minZoom: 1.3,
                 maxZoom: 7,
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
                 onTap: (tapPosition, point) {
                   HapticFeedback.selectionClick();
-                  // En yakın butonu bul ve seç
-                  if (visibleCountries.isEmpty) return;
+                  if (visibleQuestions.isEmpty) return;
                   final Distance distance = const Distance();
                   Question? nearest;
                   double? nearestKm;
-                  for (final q in visibleCountries) {
+                  for (final q in visibleQuestions) {
                     final meters = distance(point, q.location);
                     final km = meters / 1000.0;
                     if (nearest == null || km < nearestKm!) {
@@ -163,7 +166,7 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                   }
                   if (nearest != null) {
                     setState(() {
-                      _selectedCountryId = nearest!.id;
+                      _selectedId = nearest!.id;
                     });
                   }
                 },
@@ -179,11 +182,11 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                 ),
                 CircleLayer(
                   circles: [
-                    for (final q in visibleCountries)
+                    for (final q in visibleQuestions)
                       CircleMarker(
                         point: q.location,
-                        radius: _selectedCountryId == q.id ? 14 : 10,
-                        color: _selectedCountryId == q.id
+                        radius: _selectedId == q.id ? 14 : 10,
+                        color: _selectedId == q.id
                             ? Colors.purpleAccent.withOpacity(0.9)
                             : Colors.blue.withOpacity(0.7),
                         borderColor: Colors.white,
@@ -195,7 +198,6 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
               ],
             ),
           ),
-          // Üstte soru metni overlay
           Positioned(
             top: 12,
             left: 16,
@@ -216,7 +218,6 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
               ),
             ),
           ),
-          // Altta sadece buton overlay
           Positioned(
             left: 16,
             right: 16,
@@ -226,14 +227,14 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
               child: ElevatedButton(
                 onPressed: () {
                   HapticFeedback.lightImpact();
-                  if (_selectedCountryId == null) {
+                  if (_selectedId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Tap on a circle to answer.')),
                     );
                     return;
                   }
 
-                  final isCorrect = _selectedCountryId == currentQuestion.id;
+                  final isCorrect = _selectedId == currentQuestion.id;
 
                   showDialog<void>(
                     context: context,
@@ -263,30 +264,25 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                         ),
                         content: Text(
                           isCorrect
-                              ? 'You selected the right country.'
-                              : 'That is not the correct country.',
+                              ? 'You selected the right location.'
+                              : 'That is not the correct location.',
                         ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                               setState(() {
-                                // Yanlışsa aynı soruda kal, sadece seçimi temizle
                                 if (isCorrect) {
-                                  // Bu ülkeyi tamamen kaldır (noktası kaybolsun)
                                   _answeredIds.add(currentQuestion.id);
-
-                                  // Eğer tüm ülkeler doğru bilindiyse, bitiş ekranına geç
                                   if (_answeredIds.length >= totalQuestions) {
                                     _currentIndex = 0;
                                   } else {
-                                    // Doğruysa bir sonraki soruya geç (varsa)
                                     if (_currentIndex < totalQuestions - 1) {
                                       _currentIndex++;
                                     }
                                   }
                                 }
-                                _selectedCountryId = null;
+                                _selectedId = null;
                               });
                             },
                             child: const Text('Next'),
@@ -299,9 +295,8 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: _selectedCountryId == null
-                      ? Colors.blueAccent
-                      : Colors.purpleAccent,
+                  backgroundColor:
+                      _selectedId == null ? Colors.blueAccent : Colors.purpleAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
