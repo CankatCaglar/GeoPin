@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'stat_card.dart';
 import 'background_music_service.dart';
+import 'theme_provider.dart';
 import 'america_button_game.dart';
 import 'europe_button_game.dart';
 import 'asia_button_game.dart';
@@ -23,27 +24,23 @@ void main() async {
   runApp(const ProviderScope(child: GeoPinApp()));
 }
 
-class GeoPinApp extends StatelessWidget {
+class GeoPinApp extends ConsumerWidget {
   const GeoPinApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     BackgroundMusicService.instance.play();
+    final themeMode = ref.watch(themeProvider);
+    
     return ListenableBuilder(
       listenable: AppLocalizations(),
       builder: (context, child) {
         return MaterialApp(
           title: 'GeoPin',
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.dark,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.blue,
-              brightness: Brightness.dark,
-            ),
-            useMaterial3: true,
-            fontFamily: 'SF Pro',
-          ),
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          themeMode: themeMode,
           home: const SplashScreen(),
         );
       },
@@ -60,6 +57,7 @@ class Category {
     required this.icon,
     required this.isLocked,
     this.backgroundImage,
+    this.isPremium = false,
   });
 
   final String id;
@@ -67,6 +65,7 @@ class Category {
   final IconData icon;
   final bool isLocked;
   final String? backgroundImage;
+  final bool isPremium;
   
   String get title => AppLocalizations().get(titleKey);
 }
@@ -138,15 +137,23 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: false,
       backgroundImage: 'assets/images/tourist_places_2.jpg',
     ),
-    // 3) Capitals
+    // 3) Capitals 1
     Category(
-      id: 'capitals',
-      titleKey: 'capitals',
-      icon: Icons.location_on,
+      id: 'capitals_1',
+      titleKey: 'capitals_1',
+      icon: Icons.location_city,
       isLocked: false,
       backgroundImage: 'assets/images/capitals.jpg',
     ),
-    // 4) Historical Landmarks (eski Historical Monuments, kilitsiz)
+    // 4) Capitals 2
+    Category(
+      id: 'capitals_2',
+      titleKey: 'capitals_2',
+      icon: Icons.location_city,
+      isLocked: false,
+      backgroundImage: 'assets/images/capitals.jpg',
+    ),
+    // 5) Historical Landmarks (eski Historical Monuments, kilitsiz)
     Category(
       id: 'monuments',
       titleKey: 'historical_landmarks',
@@ -265,6 +272,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       icon: Icons.account_balance,
       isLocked: false,
       backgroundImage: 'assets/images/iconic_bridges.jpg',
+      isPremium: true,
     ),
     // 14) Tallest Skyscrapers
     Category(
@@ -273,6 +281,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       icon: Icons.apartment,
       isLocked: false,
       backgroundImage: 'assets/images/tallest_skyscrapers.jpg',
+      isPremium: true,
     ),
     // 15) World Cuisine
     Category(
@@ -281,6 +290,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       icon: Icons.restaurant,
       isLocked: false,
       backgroundImage: 'assets/images/world_cuisine.jpg',
+      isPremium: true,
     ),
     // 16) Football Stadiums (mevcut stadiums kategorisi)
     Category(
@@ -289,6 +299,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       icon: Icons.sports_soccer,
       isLocked: false,
       backgroundImage: 'assets/images/stadiums.jpg',
+      isPremium: true,
     ),
     // 17) Famous Airports
     Category(
@@ -297,6 +308,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       icon: Icons.flight_takeoff,
       isLocked: false,
       backgroundImage: 'assets/images/airports.jpg',
+      isPremium: true,
     ),
   ];
 });
@@ -370,102 +382,92 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              const Color(0xFF1A1A2E),
-              const Color(0xFF16213E),
-              const Color(0xFF0F3460),
-            ],
-          ),
-        ),
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Logo Container - gerçek app icon görseli ile
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 20,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Image.asset(
-                          'assets/images/app_icon.png', // Yeni ana ikon görselin
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                      // App Name
-                      const Text(
-                        'GeoPin',
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Tagline
-                      Text(
-                        AppLocalizations().get('app_tagline'),
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withValues(alpha: 0.8),
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 60),
-                      // Loading indicator
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.blue.shade400,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo Container - gerçek app icon görseli ile
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 20,
+                            spreadRadius: 5,
                           ),
+                        ],
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        'assets/images/app_icon.png', // Yeni ana ikon görselin
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    // App Name
+                    Text(
+                      'GeoPin',
+                      style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Tagline
+                    Text(
+                      AppLocalizations().get('app_tagline'),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 60),
+                    // Loading indicator
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).brightness == Brightness.dark 
+                              ? Colors.blue.shade400 
+                              : Colors.blue.shade600,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void _showLanguageDialog(BuildContext context) {
     final loc = AppLocalizations();
     showDialog(
@@ -575,6 +577,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               HapticFeedback.selectionClick();
               _showLanguageDialog(context);
+            },
+          ),
+          const Divider(height: 1),
+          SwitchListTile(
+            secondary: Icon(
+              ref.watch(themeProvider) == ThemeMode.dark 
+                  ? Icons.dark_mode 
+                  : Icons.light_mode,
+            ),
+            title: Text(AppLocalizations().get('theme')),
+            subtitle: Text(
+              ref.watch(themeProvider) == ThemeMode.dark 
+                  ? AppLocalizations().get('dark_mode') 
+                  : AppLocalizations().get('light_mode'),
+            ),
+            value: ref.watch(themeProvider) == ThemeMode.light,
+            onChanged: (value) {
+              HapticFeedback.selectionClick();
+              ref.read(themeProvider.notifier).toggleTheme();
             },
           ),
           const Divider(height: 1),
@@ -689,10 +710,41 @@ class CategoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(categoriesProvider);
+    final loc = AppLocalizations();
+
+    // Kategorileri gruplara ayır
+    final continents = categories.where((c) => 
+      c.id.contains('europe') || c.id.contains('asia') || 
+      c.id.contains('africa') || c.id == 'america' || c.id == 'oceania'
+    ).toList();
+    
+    final famousPlaces = categories.where((c) => 
+      c.id.contains('tourist_places') || c.id.contains('capitals') || 
+      c.id == 'historical_landmarks'
+    ).toList();
+    
+    final nature = categories.where((c) => 
+      c.id.contains('natural_wonders')
+    ).toList();
+    
+    final usStates = categories.where((c) => 
+      c.id.contains('us_states')
+    ).toList();
+    
+    final premiumContent = categories.where((c) => 
+      c.id == 'iconic_bridges' || c.id == 'tallest_skyscrapers' || 
+      c.id == 'world_cuisine' || c.id == 'stadiums' || c.id == 'airports'
+    ).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GeoPin'),
+        title: Text(
+          loc.get('app_name'),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -712,20 +764,85 @@ class CategoryScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 1,
-        ),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return _CategoryCard(category: category);
-        },
+      body: ListView(
+        padding: const EdgeInsets.only(top: 16, bottom: 48),
+        children: [
+          if (famousPlaces.isNotEmpty)
+            _CategorySection(
+              title: loc.get('famous_places'),
+              categories: famousPlaces,
+            ),
+          if (continents.isNotEmpty)
+            _CategorySection(
+              title: loc.get('continents'),
+              categories: continents,
+            ),
+          if (usStates.isNotEmpty)
+            _CategorySection(
+              title: loc.get('us_states'),
+              categories: usStates,
+            ),
+          if (nature.isNotEmpty)
+            _CategorySection(
+              title: loc.get('natural_wonders_section'),
+              categories: nature,
+            ),
+          if (premiumContent.isNotEmpty)
+            _CategorySection(
+              title: loc.get('premium_content'),
+              categories: premiumContent,
+            ),
+        ],
       ),
+    );
+  }
+}
+
+class _CategorySection extends StatelessWidget {
+  const _CategorySection({
+    required this.title,
+    required this.categories,
+  });
+
+  final String title;
+  final List<Category> categories;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.white 
+                  : Colors.black,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: SizedBox(
+                  width: 180,
+                  child: _CategoryCard(category: categories[index]),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -743,7 +860,7 @@ class _CategoryCard extends ConsumerWidget {
       borderRadius: BorderRadius.circular(16),
       onTap: () {
         HapticFeedback.selectionClick();
-        if (isLocked) {
+        if (isLocked || category.isPremium) {
           _showPaywall(context, category);
         } else {
           // America, Europe, Asia ve Africa kategorileri için özel butonlu harita ekranlarını aç
@@ -894,7 +1011,7 @@ class _CategoryCard extends ConsumerWidget {
                 ),
               ),
             ),
-            if (isLocked)
+            if (isLocked || category.isPremium)
               Positioned.fill(
                 child: Center(
                   child: Container(
@@ -943,7 +1060,6 @@ class _CategoryCard extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: Container(
@@ -955,62 +1071,69 @@ class _CategoryCard extends ConsumerWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+              const Icon(
+                Icons.lock,
+                color: Colors.amber,
+                size: 48,
+              ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Icon(Icons.workspace_premium, color: Colors.amber),
-                  const SizedBox(width: 8),
-                  Text(
-                    loc.get('unlock_all_maps'),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              Text(
+                loc.get('upgrade_to_premium'),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                '"${category.title}" ${loc.get('category_included_in_pro')}',
+                loc.get('upgrade_description'),
                 style: const TextStyle(
+                  fontSize: 14,
                   color: Colors.white70,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                  backgroundColor: Colors.tealAccent.shade400,
+                  minimumSize: const Size.fromHeight(52),
+                  backgroundColor: Colors.amber,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 onPressed: () {
-                  // TODO: Satın alma entegrasyonu.
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(loc.get('purchase_flow_not_added')),
+                  // Settings ekranına yönlendir
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const SettingsScreen(),
                     ),
                   );
                 },
                 child: Text(
-                  loc.get('get_premium'),
+                  loc.get('upgrade_to_premium'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
                 child: Text(
                   loc.get('cancel'),
-                  style: const TextStyle(color: Colors.white70),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -2591,70 +2714,70 @@ final questionsProvider = Provider<List<Question>>((ref) {
     // EASY - Very famous capitals everyone knows
     Question(
       id: 'paris',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Paris?',
       lat: 48.8566,
       lng: 2.3522,
     ),
     Question(
       id: 'london',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is London?',
       lat: 51.5074,
       lng: -0.1278,
     ),
     Question(
       id: 'washington',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Washington Dc?',
       lat: 38.9072,
       lng: -77.0369,
     ),
     Question(
       id: 'tokyo',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Tokyo?',
       lat: 35.6762,
       lng: 139.6503,
     ),
     Question(
       id: 'moscow',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Moscow?',
       lat: 55.7558,
       lng: 37.6173,
     ),
     Question(
       id: 'beijing',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Beijing?',
       lat: 39.9042,
       lng: 116.4074,
     ),
     Question(
       id: 'rome',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Rome?',
       lat: 41.9028,
       lng: 12.4964,
     ),
     Question(
       id: 'berlin',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Berlin?',
       lat: 52.5200,
       lng: 13.4050,
     ),
     Question(
       id: 'madrid',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Madrid?',
       lat: 40.4168,
       lng: -3.7038,
     ),
     Question(
       id: 'cairo',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Cairo?',
       lat: 30.0444,
       lng: 31.2357,
@@ -2663,105 +2786,105 @@ final questionsProvider = Provider<List<Question>>((ref) {
     // MEDIUM - Well-known capitals
     Question(
       id: 'ankara',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Ankara?',
       lat: 39.9334,
       lng: 32.8597,
     ),
     Question(
       id: 'vienna',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Vienna?',
       lat: 48.2082,
       lng: 16.3738,
     ),
     Question(
       id: 'athens',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Athens?',
       lat: 37.9838,
       lng: 23.7275,
     ),
     Question(
       id: 'stockholm',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Stockholm?',
       lat: 59.3293,
       lng: 18.0686,
     ),
     Question(
       id: 'oslo',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Oslo?',
       lat: 59.9139,
       lng: 10.7522,
     ),
     Question(
       id: 'copenhagen',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Copenhagen?',
       lat: 55.6761,
       lng: 12.5683,
     ),
     Question(
       id: 'warsaw',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Warsaw?',
       lat: 52.2297,
       lng: 21.0122,
     ),
     Question(
       id: 'prague',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Prague?',
       lat: 50.0755,
       lng: 14.4378,
     ),
     Question(
       id: 'budapest',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Budapest?',
       lat: 47.4979,
       lng: 19.0402,
     ),
     Question(
       id: 'lisbon',
-      categoryId: 'capitals',
+      categoryId: 'capitals_1',
       prompt: 'Where is Lisbon?',
       lat: 38.7223,
       lng: -9.1393,
     ),
     Question(
       id: 'dublin',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Dublin?',
       lat: 53.3498,
       lng: -6.2603,
     ),
     Question(
       id: 'brussels',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Brussels?',
       lat: 50.8503,
       lng: 4.3517,
     ),
     Question(
       id: 'amsterdam',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Amsterdam?',
       lat: 52.3676,
       lng: 4.9041,
     ),
     Question(
       id: 'canberra',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Canberra?',
       lat: -35.2809,
       lng: 149.1300,
     ),
     Question(
       id: 'wellington',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Wellington?',
       lat: -41.2865,
       lng: 174.7762,
@@ -2770,105 +2893,105 @@ final questionsProvider = Provider<List<Question>>((ref) {
     // HARD - Lesser-known capitals
     Question(
       id: 'brasilia',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Brasília?',
       lat: -15.8267,
       lng: -47.9218,
     ),
     Question(
       id: 'ottawa',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Ottawa?',
       lat: 45.4215,
       lng: -75.6972,
     ),
     Question(
       id: 'bern',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Bern?',
       lat: 46.9480,
       lng: 7.4474,
     ),
     Question(
       id: 'nairobi',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Nairobi?',
       lat: -1.2864,
       lng: 36.8172,
     ),
     Question(
       id: 'hanoi',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Hanoi?',
       lat: 21.0285,
       lng: 105.8542,
     ),
     Question(
       id: 'manila',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Manila?',
       lat: 14.5995,
       lng: 120.9842,
     ),
     Question(
       id: 'santiago',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Santiago?',
       lat: -33.4489,
       lng: -70.6693,
     ),
     Question(
       id: 'lima',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Lima?',
       lat: -12.0464,
       lng: -77.0428,
     ),
     Question(
       id: 'bogota',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Bogotá?',
       lat: 4.7110,
       lng: -74.0721,
     ),
     Question(
       id: 'riyadh',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Riyadh?',
       lat: 24.7136,
       lng: 46.6753,
     ),
     Question(
       id: 'tehran',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Tehran?',
       lat: 35.6892,
       lng: 51.3890,
     ),
     Question(
       id: 'islamabad',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Islamabad?',
       lat: 33.6844,
       lng: 73.0479,
     ),
     Question(
       id: 'kathmandu',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Kathmandu?',
       lat: 27.7172,
       lng: 85.3240,
     ),
     Question(
       id: 'addis_ababa',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Addis Ababa?',
       lat: 9.0320,
       lng: 38.7469,
     ),
     Question(
       id: 'kampala',
-      categoryId: 'capitals',
+      categoryId: 'capitals_2',
       prompt: 'Where is Kampala?',
       lat: 0.3476,
       lng: 32.5825,
@@ -5093,11 +5216,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       Expanded(
                         child: Text(
                           widget.categoryTitle,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white70,
-                          ),
                         ),
                       ),
                       Container(
