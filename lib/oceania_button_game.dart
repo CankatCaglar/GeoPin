@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'main.dart' show questionsProvider, Question;
+import 'app_localizations.dart';
 
 class OceaniaButtonGameScreen extends ConsumerStatefulWidget {
   const OceaniaButtonGameScreen({super.key});
@@ -45,27 +46,27 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
+                    children: [
+                      const Icon(
                         Icons.emoji_events,
                         size: 80,
                         color: Colors.amber,
                       ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       Text(
-                        'Oceania Completed!',
-                        style: TextStyle(
+                        AppLocalizations().get('oceania_completed'),
+                        style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 32.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
                         child: Text(
-                          'You found all the countries in Oceania. Nice job explorer!',
-                          style: TextStyle(
+                          AppLocalizations().get('oceania_completed_msg'),
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white70,
                           ),
@@ -93,8 +94,8 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                         ),
                       ),
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text(
-                        'Back to Main Menu',
+                      label: Text(
+                        AppLocalizations().get('back_to_main_menu'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -122,6 +123,13 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            Navigator.of(context).pop();
+          },
+        ),
         title: const Text('Oceania Quiz'),
         centerTitle: true,
       ),
@@ -175,8 +183,8 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                         point: q.location,
                         radius: _selectedCountryId == q.id ? 14 : 10,
                         color: _selectedCountryId == q.id
-                            ? Colors.purpleAccent.withOpacity(0.9)
-                            : Colors.blue.withOpacity(0.7),
+                            ? Colors.purpleAccent.withValues(alpha: 0.9)
+                            : Colors.blue.withValues(alpha: 0.7),
                         borderColor: Colors.white,
                         borderStrokeWidth: 2,
                         useRadiusInMeter: false,
@@ -193,11 +201,11 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                currentQuestion.prompt,
+                currentQuestion.getLocalizedPrompt(),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -217,7 +225,7 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                   HapticFeedback.lightImpact();
                   if (_selectedCountryId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Tap on a circle to answer.')),
+                      SnackBar(content: Text(AppLocalizations().get('tap_circle_to_answer'))),
                     );
                     return;
                   }
@@ -239,7 +247,7 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              isCorrect ? 'Correct!' : 'Wrong',
+                              isCorrect ? AppLocalizations().get('correct') : AppLocalizations().get('wrong'),
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -252,8 +260,8 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                         ),
                         content: Text(
                           isCorrect
-                              ? 'You selected the right country.'
-                              : 'That is not the correct country.',
+                              ? AppLocalizations().get('you_selected_correct')
+                              : (AppLocalizations().currentLanguage == 'tr' ? 'Bu doğru cevap değil.' : 'That is not the correct answer.'),
                         ),
                         actions: [
                           TextButton(
@@ -273,7 +281,7 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                                 _selectedCountryId = null;
                               });
                             },
-                            child: const Text('Next'),
+                            child: Text(AppLocalizations().get('next')),
                           ),
                         ],
                       );
@@ -290,8 +298,8 @@ class _OceaniaButtonGameScreenState extends ConsumerState<OceaniaButtonGameScree
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
-                  'Guess',
+                child: Text(
+                  AppLocalizations().get('guess'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

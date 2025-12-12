@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'main.dart' show questionsProvider, Question; // Question ve questionsProvider kullanımı
+import 'app_localizations.dart';
 
 class EuropeButtonGameScreen extends ConsumerStatefulWidget {
   const EuropeButtonGameScreen({super.key, required this.categoryId, required this.title});
@@ -98,8 +99,8 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                         ),
                       ),
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text(
-                        'Back to Main Menu',
+                      label: Text(
+                        AppLocalizations().get('back_to_main_menu'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -129,6 +130,13 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(widget.title),
         centerTitle: true,
       ),
@@ -184,8 +192,8 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                         point: q.location,
                         radius: _selectedCountryId == q.id ? 14 : 10,
                         color: _selectedCountryId == q.id
-                            ? Colors.purpleAccent.withOpacity(0.9)
-                            : Colors.blue.withOpacity(0.7),
+                            ? Colors.purpleAccent.withValues(alpha: 0.9)
+                            : Colors.blue.withValues(alpha: 0.7),
                         borderColor: Colors.white,
                         borderStrokeWidth: 2,
                         useRadiusInMeter: false,
@@ -203,11 +211,11 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                currentQuestion.prompt,
+                currentQuestion.getLocalizedPrompt(),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -250,7 +258,7 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              isCorrect ? 'Correct!' : 'Wrong',
+                              isCorrect ? AppLocalizations().get('correct') : AppLocalizations().get('wrong'),
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -263,8 +271,12 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                         ),
                         content: Text(
                           isCorrect
-                              ? 'You selected the right country.'
-                              : 'That is not the correct country.',
+                              ? (AppLocalizations().currentLanguage == 'tr' 
+                                  ? 'Doğru ülkeyi seçtiniz.' 
+                                  : 'You selected the right country.')
+                              : (AppLocalizations().currentLanguage == 'tr'
+                                  ? 'Bu doğru ülke değil.'
+                                  : 'That is not the correct country.'),
                         ),
                         actions: [
                           TextButton(
@@ -289,7 +301,7 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                                 _selectedCountryId = null;
                               });
                             },
-                            child: const Text('Next'),
+                            child: Text(AppLocalizations().get('next')),
                           ),
                         ],
                       );
@@ -307,8 +319,8 @@ class _EuropeButtonGameScreenState extends ConsumerState<EuropeButtonGameScreen>
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
-                  'Guess',
+                child: Text(
+                  AppLocalizations().get('guess'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

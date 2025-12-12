@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'main.dart' show questionsProvider, Question;
+import 'app_localizations.dart';
 
 class UsStatesButtonGameScreen extends ConsumerStatefulWidget {
   const UsStatesButtonGameScreen({super.key, required this.title, required this.part});
 
-  final String title; // 'US States 1' veya 'US States 2'
+  final String title; // AppLocalizations().get('us_states_1') veya AppLocalizations().get('us_states_2')
   final int part; // 1 veya 2
 
   @override
@@ -66,7 +67,7 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        '${widget.title} Completed!',
+                        AppLocalizations().get('us_states_completed'),
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -74,10 +75,10 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 32.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
                         child: Text(
-                          'You found all the US states in this part. Nice job explorer!',
+                          AppLocalizations().get('us_states_completed_msg'),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white70,
@@ -106,8 +107,8 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                         ),
                       ),
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text(
-                        'Back to Main Menu',
+                      label: Text(
+                        AppLocalizations().get('back_to_main_menu'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -135,6 +136,13 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(widget.title),
         centerTitle: true,
       ),
@@ -188,8 +196,8 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                         point: q.location,
                         radius: _selectedStateId == q.id ? 14 : 10,
                         color: _selectedStateId == q.id
-                            ? Colors.purpleAccent.withOpacity(0.9)
-                            : Colors.blue.withOpacity(0.7),
+                            ? Colors.purpleAccent.withValues(alpha: 0.9)
+                            : Colors.blue.withValues(alpha: 0.7),
                         borderColor: Colors.white,
                         borderStrokeWidth: 2,
                         useRadiusInMeter: false,
@@ -206,11 +214,11 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                currentQuestion.prompt,
+                currentQuestion.getLocalizedPrompt(),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -230,7 +238,7 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                   HapticFeedback.lightImpact();
                   if (_selectedStateId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Tap on a circle to answer.')),
+                      SnackBar(content: Text(AppLocalizations().get('tap_circle_to_answer'))),
                     );
                     return;
                   }
@@ -252,7 +260,7 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              isCorrect ? 'Correct!' : 'Wrong',
+                              isCorrect ? AppLocalizations().get('correct') : AppLocalizations().get('wrong'),
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -265,8 +273,8 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                         ),
                         content: Text(
                           isCorrect
-                              ? 'You selected the right state.'
-                              : 'That is not the correct state.',
+                              ? AppLocalizations().get('you_selected_correct')
+                              : (AppLocalizations().currentLanguage == 'tr' ? 'Bu doğru cevap değil.' : 'That is not the correct answer.'),
                         ),
                         actions: [
                           TextButton(
@@ -286,7 +294,7 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                                 _selectedStateId = null;
                               });
                             },
-                            child: const Text('Next'),
+                            child: Text(AppLocalizations().get('next')),
                           ),
                         ],
                       );
@@ -303,8 +311,8 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
-                  'Guess',
+                child: Text(
+                  AppLocalizations().get('guess'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

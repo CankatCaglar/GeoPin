@@ -15,8 +15,11 @@ import 'natural_wonders_button_game.dart';
 import 'world_cuisine_button_game.dart';
 import 'stadiums_button_game.dart';
 import 'airports_button_game.dart';
+import 'app_localizations.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppLocalizations().initialize();
   runApp(const ProviderScope(child: GeoPinApp()));
 }
 
@@ -25,21 +28,25 @@ class GeoPinApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Başlangıçta arka plan müziğini başlat
     BackgroundMusicService.instance.play();
-    return MaterialApp(
-      title: 'GeoPin',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        fontFamily: 'SF Pro',
-      ),
-      home: const SplashScreen(),
+    return ListenableBuilder(
+      listenable: AppLocalizations(),
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'GeoPin',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.blue,
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: true,
+            fontFamily: 'SF Pro',
+          ),
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }
@@ -49,17 +56,19 @@ class GeoPinApp extends StatelessWidget {
 class Category {
   Category({
     required this.id,
-    required this.title,
+    required this.titleKey,
     required this.icon,
     required this.isLocked,
     this.backgroundImage,
   });
 
   final String id;
-  final String title;
+  final String titleKey;
   final IconData icon;
   final bool isLocked;
   final String? backgroundImage;
+  
+  String get title => AppLocalizations().get(titleKey);
 }
 
 class Question {
@@ -75,13 +84,39 @@ class Question {
 
   final String id;
   final String categoryId;
-  final String prompt;
+  final String prompt; // Orijinal İngilizce soru
   final double lat;
   final double lng;
   final List<LatLng>? polygon; // Ülke sınırları için polygon koordinatları
   final bool isPolygonBased; // Polygon tabanlı soru mu?
 
   LatLng get location => LatLng(lat, lng);
+  
+  // Lokalize edilmiş soru metni
+  String getLocalizedPrompt() {
+    final currentLang = AppLocalizations().currentLanguage;
+    if (currentLang == 'tr') {
+      // Türkçe için çeviri ara
+      final key = _promptToKey(prompt);
+      final translated = AppLocalizations().get(key);
+      if (translated != key) {
+        return translated;
+      }
+    }
+    // İngilizce veya çeviri yoksa orijinal prompt
+    return prompt;
+  }
+  
+  // Prompt'u çeviri anahtarına dönüştür
+  String _promptToKey(String prompt) {
+    String key = prompt.toLowerCase();
+    key = key.replaceAll('where is ', 'q_').replaceAll('where are ', 'q_');
+    key = key.replaceAll('?', '').replaceAll("'", '').replaceAll('"', '');
+    key = key.replaceAll(' ', '_').replaceAll(',', '').replaceAll('(', '').replaceAll(')', '');
+    key = key.replaceAll('.', '').replaceAll('–', '').replaceAll(''', '').replaceAll(''', '');
+    key = key.replaceAll('__', '_').trim();
+    return key.replaceAll('_', '_').replaceAll('__', '_');
+  }
 }
 
 // SABİT KATEGORİLER (ileride JSON'dan okunacak)
@@ -90,7 +125,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 1) Tourist Places 1
     Category(
       id: 'tourist_places_1',
-      title: 'Tourist Places 1',
+      titleKey: 'tourist_places_1',
       icon: Icons.travel_explore,
       isLocked: false,
       backgroundImage: 'assets/images/tourist_places.jpg',
@@ -98,7 +133,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 2) Tourist Places 2
     Category(
       id: 'tourist_places_2',
-      title: 'Tourist Places 2',
+      titleKey: 'tourist_places_2',
       icon: Icons.travel_explore,
       isLocked: false,
       backgroundImage: 'assets/images/tourist_places_2.jpg',
@@ -106,7 +141,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 3) Capitals
     Category(
       id: 'capitals',
-      title: 'Capitals',
+      titleKey: 'capitals',
       icon: Icons.location_on,
       isLocked: false,
       backgroundImage: 'assets/images/capitals.jpg',
@@ -114,7 +149,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 4) Historical Landmarks (eski Historical Monuments, kilitsiz)
     Category(
       id: 'monuments',
-      title: 'Historical Landmarks',
+      titleKey: 'historical_landmarks',
       icon: Icons.account_balance,
       isLocked: false,
       backgroundImage: 'assets/images/monuments.jpg',
@@ -122,7 +157,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 5) America
     Category(
       id: 'america',
-      title: 'America',
+      titleKey: 'america',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/america.jpg',
@@ -130,7 +165,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 6) Europe 1
     Category(
       id: 'europe_1',
-      title: 'Europe 1',
+      titleKey: 'europe_1',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/europe.jpg',
@@ -138,7 +173,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 7) Europe 2
     Category(
       id: 'europe_2',
-      title: 'Europe 2',
+      titleKey: 'europe_2',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/europe.jpg',
@@ -146,7 +181,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 8) Asia 1
     Category(
       id: 'asia_1',
-      title: 'Asia 1',
+      titleKey: 'asia_1',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/asia.jpg',
@@ -154,7 +189,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 9) Asia 2
     Category(
       id: 'asia_2',
-      title: 'Asia 2',
+      titleKey: 'asia_2',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/asia.jpg',
@@ -162,7 +197,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 10) Africa 1
     Category(
       id: 'africa_1',
-      title: 'Africa 1',
+      titleKey: 'africa_1',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/africa.jpg',
@@ -170,7 +205,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 11) Africa 2
     Category(
       id: 'africa_2',
-      title: 'Africa 2',
+      titleKey: 'africa_2',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/africa.jpg',
@@ -178,7 +213,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 12) Africa 3
     Category(
       id: 'africa_3',
-      title: 'Africa 3',
+      titleKey: 'africa_3',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/africa.jpg',
@@ -186,7 +221,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 13) Oceania
     Category(
       id: 'oceania',
-      title: 'Oceania',
+      titleKey: 'oceania',
       icon: Icons.public,
       isLocked: false,
       backgroundImage: 'assets/images/oceania.jpg',
@@ -194,7 +229,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 14) US States 1
     Category(
       id: 'us_states_1',
-      title: 'US States 1',
+      titleKey: 'us_states_1',
       icon: Icons.flag,
       isLocked: false,
       backgroundImage: 'assets/images/us_states.jpg',
@@ -202,7 +237,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 15) US States 2
     Category(
       id: 'us_states_2',
-      title: 'US States 2',
+      titleKey: 'us_states_2',
       icon: Icons.flag,
       isLocked: false,
       backgroundImage: 'assets/images/us_states.jpg',
@@ -210,7 +245,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 11) Natural Wonders 1
     Category(
       id: 'natural_wonders_1',
-      title: 'Natural Wonders 1',
+      titleKey: 'natural_wonders_1',
       icon: Icons.landscape,
       isLocked: false,
       backgroundImage: 'assets/images/natural_wonders.jpg',
@@ -218,7 +253,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 12) Natural Wonders 2
     Category(
       id: 'natural_wonders_2',
-      title: 'Natural Wonders 2',
+      titleKey: 'natural_wonders_2',
       icon: Icons.landscape,
       isLocked: false,
       backgroundImage: 'assets/images/natural_wonders.jpg',
@@ -226,7 +261,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 13) Iconic Bridges
     Category(
       id: 'iconic_bridges',
-      title: 'Iconic Bridges',
+      titleKey: 'iconic_bridges',
       icon: Icons.account_balance,
       isLocked: false,
       backgroundImage: 'assets/images/iconic_bridges.jpg',
@@ -234,7 +269,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 14) Tallest Skyscrapers
     Category(
       id: 'tallest_skyscrapers',
-      title: 'Tallest Skyscrapers',
+      titleKey: 'tallest_skyscrapers',
       icon: Icons.apartment,
       isLocked: false,
       backgroundImage: 'assets/images/tallest_skyscrapers.jpg',
@@ -242,7 +277,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 15) World Cuisine
     Category(
       id: 'world_cuisine',
-      title: 'World Cuisine',
+      titleKey: 'world_cuisine',
       icon: Icons.restaurant,
       isLocked: false,
       backgroundImage: 'assets/images/world_cuisine.jpg',
@@ -250,7 +285,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 16) Football Stadiums (mevcut stadiums kategorisi)
     Category(
       id: 'stadiums',
-      title: 'Football Stadiums',
+      titleKey: 'football_stadiums',
       icon: Icons.sports_soccer,
       isLocked: false,
       backgroundImage: 'assets/images/stadiums.jpg',
@@ -258,7 +293,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
     // 17) Famous Airports
     Category(
       id: 'airports',
-      title: 'Famous Airports',
+      titleKey: 'famous_airports',
       icon: Icons.flight_takeoff,
       isLocked: false,
       backgroundImage: 'assets/images/airports.jpg',
@@ -366,7 +401,7 @@ class _SplashScreenState extends State<SplashScreen>
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
+                              color: Colors.black.withValues(alpha: 0.25),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),
@@ -392,10 +427,10 @@ class _SplashScreenState extends State<SplashScreen>
                       const SizedBox(height: 16),
                       // Tagline
                       Text(
-                        'Test Your Geography Knowledge',
+                        AppLocalizations().get('app_tagline'),
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           letterSpacing: 1,
                         ),
                       ),
@@ -423,11 +458,78 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  void _showLanguageDialog(BuildContext context) {
+    final loc = AppLocalizations();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(loc.get('language')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(loc.get('english')),
+              leading: Radio<String>(
+                value: 'en',
+                groupValue: loc.currentLanguage,
+                onChanged: (value) async {
+                  if (value != null) {
+                    await loc.setLanguage(value);
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      setState(() {});
+                    }
+                  }
+                },
+              ),
+              onTap: () async {
+                await loc.setLanguage('en');
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  setState(() {});
+                }
+              },
+            ),
+            ListTile(
+              title: Text(loc.get('turkish')),
+              leading: Radio<String>(
+                value: 'tr',
+                groupValue: loc.currentLanguage,
+                onChanged: (value) async {
+                  if (value != null) {
+                    await loc.setLanguage(value);
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      setState(() {});
+                    }
+                  }
+                },
+              ),
+              onTap: () async {
+                await loc.setLanguage('tr');
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  setState(() {});
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -437,17 +539,17 @@ class SettingsScreen extends StatelessWidget {
             Navigator.of(context).pop();
           },
         ),
-        title: const Text('Settings'),
+        title: Text(loc.get('settings')),
         centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
-              'General',
-              style: TextStyle(
+              loc.get('general'),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white70,
@@ -456,25 +558,23 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.workspace_premium, color: Colors.amber),
-            title: const Text('Upgrade to Premium'),
-            subtitle: const Text('Unlock all maps and premium content'),
+            title: Text(loc.get('upgrade_to_premium')),
+            subtitle: Text(loc.get('upgrade_description')),
             onTap: () {
               HapticFeedback.selectionClick();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Premium upgrade coming soon.')),
+                SnackBar(content: Text(loc.get('premium_upgrade_coming_soon'))),
               );
             },
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.language),
-            title: const Text('Language'),
-            subtitle: const Text('English'),
+            title: Text(loc.get('language')),
+            subtitle: Text(loc.currentLanguageName),
             onTap: () {
               HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Language settings coming soon.')),
-              );
+              _showLanguageDialog(context);
             },
           ),
           const Divider(height: 1),
@@ -483,8 +583,8 @@ class SettingsScreen extends StatelessWidget {
               bool musicOn = BackgroundMusicService.instance.isEnabled;
               return SwitchListTile(
                 secondary: const Icon(Icons.music_note),
-                title: const Text('Music'),
-                subtitle: const Text('Background music on/off'),
+                title: Text(loc.get('music')),
+                subtitle: Text(loc.get('music_description')),
                 value: musicOn,
                 onChanged: (value) async {
                   HapticFeedback.selectionClick();
@@ -497,11 +597,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
-              'App',
-              style: TextStyle(
+              loc.get('app'),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white70,
@@ -510,43 +610,43 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.star_rate),
-            title: const Text('Rate App'),
+            title: Text(loc.get('rate_app')),
             onTap: () {
               HapticFeedback.selectionClick();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Rate App coming soon.')),
+                SnackBar(content: Text(loc.get('rate_app_coming_soon'))),
               );
             },
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.share),
-            title: const Text('Share App'),
+            title: Text(loc.get('share_app')),
             onTap: () {
               HapticFeedback.selectionClick();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Share App coming soon.')),
+                SnackBar(content: Text(loc.get('share_app_coming_soon'))),
               );
             },
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.email),
-            title: const Text('Contact Us'),
-            subtitle: const Text('support@geopin.app'),
+            title: Text(loc.get('contact_us')),
+            subtitle: Text(loc.get('contact_description')),
             onTap: () {
               HapticFeedback.selectionClick();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Contact flow coming soon.')),
+                SnackBar(content: Text(loc.get('contact_flow_coming_soon'))),
               );
             },
           ),
           const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
-              'Legal',
-              style: TextStyle(
+              loc.get('legal'),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white70,
@@ -555,22 +655,22 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
-            title: const Text('Privacy Policy'),
+            title: Text(loc.get('privacy_policy')),
             onTap: () {
               HapticFeedback.selectionClick();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Privacy Policy coming soon.')),
+                SnackBar(content: Text(loc.get('privacy_policy_coming_soon'))),
               );
             },
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.description),
-            title: const Text('Terms of Use'),
+            title: Text(loc.get('terms_of_use')),
             onTap: () {
               HapticFeedback.selectionClick();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Terms of Use coming soon.')),
+                SnackBar(content: Text(loc.get('terms_of_use_coming_soon'))),
               );
             },
           ),
@@ -760,7 +860,7 @@ class _CategoryCard extends ConsumerWidget {
                   image: AssetImage(category.backgroundImage!),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.3),
+                    Colors.black.withValues(alpha: 0.3),
                     BlendMode.darken,
                   ),
                 )
@@ -831,6 +931,7 @@ class _CategoryCard extends ConsumerWidget {
   }
 
   void _showPaywall(BuildContext context, Category category) {
+    final loc = AppLocalizations();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.grey.shade900,
@@ -859,9 +960,9 @@ class _CategoryCard extends ConsumerWidget {
                 children: [
                   const Icon(Icons.workspace_premium, color: Colors.amber),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Unlock all maps with Premium',
-                    style: TextStyle(
+                  Text(
+                    loc.get('unlock_all_maps'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -870,7 +971,7 @@ class _CategoryCard extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '"${category.title}" category is included in PRO package. Get Premium to access all locked categories.',
+                '"${category.title}" ${loc.get('category_included_in_pro')}',
                 style: const TextStyle(
                   color: Colors.white70,
                 ),
@@ -889,14 +990,14 @@ class _CategoryCard extends ConsumerWidget {
                   // TODO: Satın alma entegrasyonu.
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Purchase flow not yet added.'),
+                    SnackBar(
+                      content: Text(loc.get('purchase_flow_not_added')),
                     ),
                   );
                 },
-                child: const Text(
-                  'Get Premium',
-                  style: TextStyle(
+                child: Text(
+                  loc.get('get_premium'),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -907,9 +1008,9 @@ class _CategoryCard extends ConsumerWidget {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.white70),
+                child: Text(
+                  loc.get('cancel'),
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ),
             ],
@@ -928,63 +1029,63 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'statue_liberty',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Statue of Liberty?',
+      prompt: 'Where is Statue Liberty?',
       lat: 40.6892,
       lng: -74.0445,
     ),
     Question(
       id: 'eiffel',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Eiffel Tower?',
+      prompt: 'Where is Eiffel?',
       lat: 48.8584,
       lng: 2.2945,
     ),
     Question(
       id: 'colosseum',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Colosseum?',
+      prompt: 'Where is Colosseum?',
       lat: 41.8902,
       lng: 12.4922,
     ),
     Question(
       id: 'bigben',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is Big Ben?',
+      prompt: 'Where is Bigben?',
       lat: 51.4994,
       lng: -0.1245,
     ),
     Question(
       id: 'sydney_opera',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Sydney Opera House?',
+      prompt: 'Where is Sydney Opera?',
       lat: -33.8568,
       lng: 151.2153,
     ),
     Question(
       id: 'taj_mahal',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Taj Mahal?',
+      prompt: 'Where is Taj Mahal?',
       lat: 27.1751,
       lng: 78.0421,
     ),
     Question(
       id: 'great_wall',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Great Wall of China?',
+      prompt: 'Where is Great Wall?',
       lat: 40.4319,
       lng: 116.5704,
     ),
     Question(
       id: 'golden_gate',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Golden Gate Bridge?',
+      prompt: 'Where is Golden Gate?',
       lat: 37.8199,
       lng: -122.4783,
     ),
     Question(
       id: 'christ_redeemer',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is Christ the Redeemer?',
+      prompt: 'Where is Christ Redeemer?',
       lat: -22.9519,
       lng: -43.2105,
     ),
@@ -998,7 +1099,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'louvre',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Louvre Museum?',
+      prompt: 'Where is Louvre?',
       lat: 48.8606,
       lng: 2.3376,
     ),
@@ -1012,21 +1113,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'notre_dame',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is Notre Dame Cathedral?',
+      prompt: 'Where is Notre Dame?',
       lat: 48.8530,
       lng: 2.3499,
     ),
     Question(
       id: 'versailles',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Palace of Versailles?',
+      prompt: 'Where is Versailles?',
       lat: 48.8049,
       lng: 2.1204,
     ),
     Question(
       id: 'acropolis',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is the Acropolis?',
+      prompt: 'Where is Acropolis?',
       lat: 37.9715,
       lng: 23.7267,
     ),
@@ -1056,14 +1157,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'saint_pauls',
       categoryId: 'tourist_places_1',
-      prompt: 'Where is St. Paul\'s Cathedral?',
+      prompt: 'Where is St Pauls Cathedral?',
       lat: 51.5138,
       lng: -0.0984,
     ),
     Question(
       id: 'windmills',
       categoryId: 'tourist_places_1',
-      prompt: 'Where are the Amsterdam Windmills?',
+      prompt: 'Where is the amsterdam windmills?',
       lat: 52.3740,
       lng: 4.8897,
     ),
@@ -1091,14 +1192,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'niagara_falls',
       categoryId: 'tourist_places_2',
-      prompt: 'Where are Niagara Falls?',
+      prompt: 'Where is Niagara Falls?',
       lat: 43.0962,
       lng: -79.0377,
     ),
     Question(
       id: 'grand_canyon',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Grand Canyon?',
+      prompt: 'Where is the grand canyon?',
       lat: 36.1069,
       lng: -112.1129,
     ),
@@ -1126,7 +1227,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'empire_state',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Empire State Building?',
+      prompt: 'Where is the empire state building?',
       lat: 40.7484,
       lng: -73.9857,
     ),
@@ -1163,21 +1264,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'liberty_bell',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Liberty Bell?',
+      prompt: 'Where is the liberty bell?',
       lat: 39.9496,
       lng: -75.1503,
     ),
     Question(
       id: 'space_needle',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Space Needle?',
+      prompt: 'Where is the space needle?',
       lat: 47.6205,
       lng: -122.3493,
     ),
     Question(
       id: 'hoover_dam',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Hoover Dam?',
+      prompt: 'Where is the hoover dam?',
       lat: 36.0161,
       lng: -114.7377,
     ),
@@ -1191,21 +1292,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'las_vegas',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Las Vegas Strip?',
+      prompt: 'Where is the las vegas strip?',
       lat: 36.1147,
       lng: -115.1728,
     ),
     Question(
       id: 'hollywood_sign',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Hollywood Sign?',
+      prompt: 'Where is the hollywood sign?',
       lat: 34.1341,
       lng: -118.3215,
     ),
     Question(
       id: 'colosseum_mexico',
       categoryId: 'tourist_places_2',
-      prompt: 'Where is the Colosseum in Mexico City?',
+      prompt: 'Where is the colosseum in mexico city?',
       lat: 19.4326,
       lng: -99.1332,
     ),
@@ -1221,35 +1322,35 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'niagara_falls',
       categoryId: 'natural_wonders',
-      prompt: 'Where are Niagara Falls?',
+      prompt: 'Where is Niagara Falls?',
       lat: 43.0962,
       lng: -79.0377,
     ),
     Question(
       id: 'grand_canyon',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Grand Canyon?',
+      prompt: 'Where is the grand canyon?',
       lat: 36.1069,
       lng: -112.1129,
     ),
     Question(
       id: 'amazon_rainforest',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Amazon Rainforest?',
+      prompt: 'Where is the amazon rainforest?',
       lat: -3.4653,
       lng: -62.2159,
     ),
     Question(
       id: 'sahara_desert',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Sahara Desert?',
+      prompt: 'Where is the sahara desert?',
       lat: 23.4162,
       lng: 25.6628,
     ),
     Question(
       id: 'great_barrier_reef',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Great Barrier Reef?',
+      prompt: 'Where is the great barrier reef?',
       lat: -18.2871,
       lng: 147.6992,
     ),
@@ -1263,14 +1364,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'dead_sea',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Dead Sea?',
+      prompt: 'Where is the dead sea?',
       lat: 31.5590,
       lng: 35.4732,
     ),
     Question(
       id: 'maldives',
       categoryId: 'natural_wonders',
-      prompt: 'Where are the Maldives?',
+      prompt: 'Where is the maldives?',
       lat: 3.2028,
       lng: 73.2207,
     ),
@@ -1305,14 +1406,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'victoria_falls',
       categoryId: 'natural_wonders',
-      prompt: 'Where are Victoria Falls?',
+      prompt: 'Where is Victoria Falls?',
       lat: -17.9243,
       lng: 25.8560,
     ),
     Question(
       id: 'galapagos_islands',
       categoryId: 'natural_wonders',
-      prompt: 'Where are the Galapagos Islands?',
+      prompt: 'Where is the galapagos islands?',
       lat: -0.9538,
       lng: -90.9656,
     ),
@@ -1326,14 +1427,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'the_alps',
       categoryId: 'natural_wonders',
-      prompt: 'Where are the Alps?',
+      prompt: 'Where is the alps?',
       lat: 46.8876,
       lng: 9.6570,
     ),
     Question(
       id: 'black_forest',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Black Forest?',
+      prompt: 'Where is the black forest?',
       lat: 48.0640,
       lng: 8.2285,
     ),
@@ -1354,21 +1455,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'red_sea',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Red Sea?',
+      prompt: 'Where is the red sea?',
       lat: 20.2802,
       lng: 38.5126,
     ),
     Question(
       id: 'caribbean_sea',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Caribbean Sea?',
+      prompt: 'Where is the caribbean sea?',
       lat: 15.3266,
       lng: -75.0152,
     ),
     Question(
       id: 'nile_river',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Nile River?',
+      prompt: 'Where is the nile river?',
       lat: 19.0,
       lng: 31.0,
     ),
@@ -1417,14 +1518,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'matterhorn',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the Matterhorn?',
+      prompt: 'Where is the matterhorn?',
       lat: 45.9763,
       lng: 7.6586,
     ),
     Question(
       id: 'capri',
       categoryId: 'natural_wonders',
-      prompt: 'Where is the island of Capri?',
+      prompt: 'Where is the island of capri?',
       lat: 40.5532,
       lng: 14.2222,
     ),
@@ -1445,7 +1546,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'dead_vlei',
       categoryId: 'natural_wonders',
-      prompt: 'Where is Dead Vlei in the Namib Desert?',
+      prompt: 'Where is Dead Vlei In The Namib Desert?',
       lat: -24.7433,
       lng: 15.2950,
     ),
@@ -1473,21 +1574,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'seychelles_natural',
       categoryId: 'natural_wonders',
-      prompt: 'Where are the Seychelles?',
+      prompt: 'Where is the seychelles?',
       lat: -4.6796,
       lng: 55.4920,
     ),
     Question(
       id: 'canary_islands',
       categoryId: 'natural_wonders',
-      prompt: 'Where are the Canary Islands?',
+      prompt: 'Where is the canary islands?',
       lat: 28.2936,
       lng: -16.6214,
     ),
     Question(
       id: 'rocky_mountains',
       categoryId: 'natural_wonders',
-      prompt: 'Where are the Rocky Mountains?',
+      prompt: 'Where is the rocky mountains?',
       lat: 39.1178,
       lng: -106.4454,
     ),
@@ -1496,7 +1597,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'golden_gate_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Golden Gate Bridge?',
+      prompt: 'Where is the golden gate bridge?',
       lat: 37.8199,
       lng: -122.4783,
     ),
@@ -1510,21 +1611,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'sydney_harbour_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Sydney Harbour Bridge?',
+      prompt: 'Where is the sydney harbour bridge?',
       lat: -33.8523,
       lng: 151.2108,
     ),
     Question(
       id: 'brooklyn_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Brooklyn Bridge?',
+      prompt: 'Where is the brooklyn bridge?',
       lat: 40.7061,
       lng: -73.9969,
     ),
     Question(
       id: 'rialto_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Rialto Bridge?',
+      prompt: 'Where is the rialto bridge?',
       lat: 45.4380,
       lng: 12.3358,
     ),
@@ -1545,56 +1646,56 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'akashi_kaikyo_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Akashi Kaikyo Bridge?',
+      prompt: 'Where is the akashi kaikyo bridge?',
       lat: 34.6178,
       lng: 135.0217,
     ),
     Question(
       id: 'millau_viaduct',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Millau Viaduct?',
+      prompt: 'Where is the millau viaduct?',
       lat: 44.0775,
       lng: 3.0226,
     ),
     Question(
       id: 'bosphorus_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the 15 July Martyrs (Bosphorus) Bridge?',
+      prompt: 'Where is the 15 july martyrs bosphorus bridge?',
       lat: 41.0450,
       lng: 29.0336,
     ),
     Question(
       id: 'vasco_da_gama_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Vasco da Gama Bridge?',
+      prompt: 'Where is the vasco da gama bridge?',
       lat: 38.7636,
       lng: -9.0370,
     ),
     Question(
       id: 'chapel_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Chapel Bridge (Kapellbrücke)?',
+      prompt: 'Where is the chapel bridge kapellbrücke?',
       lat: 47.0517,
       lng: 8.3073,
     ),
     Question(
       id: 'pont_du_gard',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is Pont du Gard?',
+      prompt: 'Where is Pont Du Gard?',
       lat: 43.9475,
       lng: 4.5350,
     ),
     Question(
       id: 'chain_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Chain Bridge in Budapest?',
+      prompt: 'Where is the chain bridge in budapest?',
       lat: 47.4980,
       lng: 19.0407,
     ),
     Question(
       id: 'helix_bridge',
       categoryId: 'iconic_bridges',
-      prompt: 'Where is the Helix Bridge?',
+      prompt: 'Where is the helix bridge?',
       lat: 1.2864,
       lng: 103.8607,
     ),
@@ -1631,7 +1732,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'empire_state_building',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is the Empire State Building?',
+      prompt: 'Where is the empire state building?',
       lat: 40.7484,
       lng: -73.9857,
     ),
@@ -1645,14 +1746,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'petronas_towers',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where are the Petronas Towers?',
+      prompt: 'Where is the petronas towers?',
       lat: 3.1579,
       lng: 101.7118,
     ),
     Question(
       id: 'shanghai_tower',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is the Shanghai Tower?',
+      prompt: 'Where is the shanghai tower?',
       lat: 31.2336,
       lng: 121.5055,
     ),
@@ -1666,14 +1767,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'the_shard',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is The Shard?',
+      prompt: 'Where is the shard?',
       lat: 51.5045,
       lng: -0.0865,
     ),
     Question(
       id: 'willis_tower',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is Willis (Sears) Tower?',
+      prompt: 'Where is Willis Sears Tower?',
       lat: 41.8789,
       lng: -87.6359,
     ),
@@ -1687,7 +1788,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'chrysler_building',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is the Chrysler Building?',
+      prompt: 'Where is the chrysler building?',
       lat: 40.7516,
       lng: -73.9755,
     ),
@@ -1701,7 +1802,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'abraj_al_bait',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is Abraj Al Bait (Mecca Clock Tower)?',
+      prompt: 'Where is Abraj Al Bait Mecca Clock Tower?',
       lat: 21.4187,
       lng: 39.8256,
     ),
@@ -1715,14 +1816,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'kingdom_centre',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is the Kingdom Centre?',
+      prompt: 'Where is the kingdom centre?',
       lat: 24.7115,
       lng: 46.6745,
     ),
     Question(
       id: 'turning_torso',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is the Turning Torso?',
+      prompt: 'Where is the turning torso?',
       lat: 55.6141,
       lng: 12.9703,
     ),
@@ -1743,7 +1844,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'lakhta_center',
       categoryId: 'tallest_skyscrapers',
-      prompt: 'Where is the Lakhta Center?',
+      prompt: 'Where is the lakhta center?',
       lat: 59.9861,
       lng: 30.1775,
     ),
@@ -1752,126 +1853,126 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'pizza_naples',
       categoryId: 'world_cuisine',
-      prompt: 'Where is the home of Neapolitan pizza?',
+      prompt: 'Where is the home of neapolitan pizza?',
       lat: 40.8518,
       lng: 14.2681,
     ),
     Question(
       id: 'sushi_tokyo',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Tokyo, the home of sushi?',
+      prompt: 'Where is Tokyo The Home Of Sushi?',
       lat: 35.6762,
       lng: 139.6503,
     ),
     Question(
       id: 'hamburger_hamburg',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Hamburg, origin of the hamburger name?',
+      prompt: 'Where is Hamburg Origin Of The Hamburger Name?',
       lat: 53.5511,
       lng: 9.9937,
     ),
     Question(
       id: 'croissant_paris',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Paris, famous for croissants?',
+      prompt: 'Where is Paris Croissants?',
       lat: 48.8566,
       lng: 2.3522,
     ),
     Question(
       id: 'tacos_mexico_city',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Mexico City, famous for tacos?',
+      prompt: 'Where is Mexico City Famous For Tacos?',
       lat: 19.4326,
       lng: -99.1332,
     ),
     Question(
       id: 'paella_valencia',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Valencia, home of paella?',
+      prompt: 'Where is Valencia Home Of Paella?',
       lat: 39.4699,
       lng: -0.3763,
     ),
     Question(
       id: 'peking_duck_beijing',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Beijing, famous for Peking Duck?',
+      prompt: 'Where is Beijing Famous For Peking Duck?',
       lat: 39.9042,
       lng: 116.4074,
     ),
     Question(
       id: 'fish_and_chips_london',
       categoryId: 'world_cuisine',
-      prompt: 'Where is London, famous for fish and chips?',
+      prompt: 'Where is London Famous For Fish And Chips?',
       lat: 51.5074,
       lng: -0.1278,
     ),
     Question(
       id: 'pad_thai_bangkok',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Bangkok, home of Pad Thai?',
+      prompt: 'Where is Bangkok Home Of Pad Thai?',
       lat: 13.7563,
       lng: 100.5018,
     ),
     Question(
       id: 'baklava_gaziantep',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Gaziantep, famous for baklava?',
+      prompt: 'Where is Gaziantep Famous For Baklava?',
       lat: 37.0662,
       lng: 37.3833,
     ),
     Question(
       id: 'wiener_schnitzel_vienna',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Vienna, famous for Wiener Schnitzel?',
+      prompt: 'Where is Vienna Famous For Wiener Schnitzel?',
       lat: 48.2082,
       lng: 16.3738,
     ),
     Question(
       id: 'goulash_budapest',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Budapest, famous for goulash?',
+      prompt: 'Where is Budapest Famous For Goulash?',
       lat: 47.4979,
       lng: 19.0402,
     ),
     Question(
       id: 'pho_hanoi',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Hanoi, home of pho?',
+      prompt: 'Where is Hanoi Home Of Pho?',
       lat: 21.0278,
       lng: 105.8342,
     ),
     Question(
       id: 'poutine_montreal',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Montreal, famous for poutine?',
+      prompt: 'Where is Montreal Famous For Poutine?',
       lat: 45.5017,
       lng: -73.5673,
     ),
     Question(
       id: 'feijoada_rio',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Rio de Janeiro, famous for feijoada?',
+      prompt: 'Where is Rio De Janeiro Famous For Feijoada?',
       lat: -22.9068,
       lng: -43.1729,
     ),
     Question(
       id: 'dim_sum_hong_kong',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Hong Kong, famous for dim sum?',
+      prompt: 'Where is Hong Kong Famous For Dim Sum?',
       lat: 22.3193,
       lng: 114.1694,
     ),
     Question(
       id: 'butter_chicken_delhi',
       categoryId: 'world_cuisine',
-      prompt: 'Where is New Delhi, famous for butter chicken?',
+      prompt: 'Where is New Delhi Famous For Butter Chicken?',
       lat: 28.6139,
       lng: 77.2090,
     ),
     Question(
       id: 'tapas_barcelona',
       categoryId: 'world_cuisine',
-      prompt: 'Where is Barcelona, famous for tapas?',
+      prompt: 'Where is Barcelona Famous For Tapas?',
       lat: 41.3851,
       lng: 2.1734,
     ),
@@ -1880,126 +1981,126 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'camp_nou',
       categoryId: 'stadiums',
-      prompt: 'Where is Camp Nou, the largest stadium in Europe?',
+      prompt: 'Where is Camp Nou The Largest Stadium In Europe?',
       lat: 41.3809,
       lng: 2.1228,
     ),
     Question(
       id: 'wembley_stadium',
       categoryId: 'stadiums',
-      prompt: 'Where is Wembley Stadium, the Home of Football?',
+      prompt: 'Where is Wembley Stadium The Home Of Football?',
       lat: 51.5560,
       lng: -0.2796,
     ),
     Question(
       id: 'maracana',
       categoryId: 'stadiums',
-      prompt: 'Where is Maracanã, the iconic World Cup venue?',
+      prompt: 'Where is Maracanã The Iconic World Cup Venue?',
       lat: -22.9121,
       lng: -43.2302,
     ),
     Question(
       id: 'santiago_bernabeu',
       categoryId: 'stadiums',
-      prompt: 'Where is Santiago Bernabéu, home of Real Madrid?',
+      prompt: 'Where is Santiago Bernabéu Home Of Real Madrid?',
       lat: 40.4531,
       lng: -3.6883,
     ),
     Question(
       id: 'old_trafford',
       categoryId: 'stadiums',
-      prompt: 'Where is Old Trafford, the Theatre of Dreams?',
+      prompt: 'Where is Old Trafford The Theatre Of Dreams?',
       lat: 53.4631,
       lng: -2.2913,
     ),
     Question(
       id: 'allianz_arena',
       categoryId: 'stadiums',
-      prompt: 'Where is Allianz Arena, with its color-changing exterior?',
+      prompt: 'Where is Allianz Arena With Its Color-Changing Exterior?',
       lat: 48.2188,
       lng: 11.6247,
     ),
     Question(
       id: 'san_siro',
       categoryId: 'stadiums',
-      prompt: 'Where is San Siro (Giuseppe Meazza), the iconic Milan stadium?',
+      prompt: 'Where is San Siro Giuseppe Meazza The Iconic Milan Stadium?',
       lat: 45.4781,
       lng: 9.1240,
     ),
     Question(
       id: 'anfield',
       categoryId: 'stadiums',
-      prompt: 'Where is Anfield, famous for "You\'ll Never Walk Alone"?',
+      prompt: 'Where is Anfield?',
       lat: 53.4308,
       lng: -2.9608,
     ),
     Question(
       id: 'la_bombonera',
       categoryId: 'stadiums',
-      prompt: 'Where is La Bombonera, home of Boca Juniors?',
+      prompt: 'Where is La Bombonera Home Of Boca Juniors?',
       lat: -34.6356,
       lng: -58.3649,
     ),
     Question(
       id: 'estadio_azteca',
       categoryId: 'stadiums',
-      prompt: 'Where is Estadio Azteca, host of two World Cup finals?',
+      prompt: 'Where is Estadio Azteca Host Of Two World Cup Finals?',
       lat: 19.3033,
       lng: -99.1500,
     ),
     Question(
       id: 'signal_iduna_park',
       categoryId: 'stadiums',
-      prompt: 'Where is Signal Iduna Park, home of the Yellow Wall?',
+      prompt: 'Where is Signal Iduna Park Home Of The Yellow Wall?',
       lat: 51.4926,
       lng: 7.4519,
     ),
     Question(
       id: 'stade_de_france',
       categoryId: 'stadiums',
-      prompt: 'Where is Stade de France, the national stadium of France?',
+      prompt: 'Where is Stade De France The National Stadium Of France?',
       lat: 48.9244,
       lng: 2.3601,
     ),
     Question(
       id: 'emirates_stadium',
       categoryId: 'stadiums',
-      prompt: 'Where is Emirates Stadium, modern home of Arsenal?',
+      prompt: 'Where is Emirates Stadium Modern Home Of Arsenal?',
       lat: 51.5550,
       lng: -0.1084,
     ),
     Question(
       id: 'johan_cruyff_arena',
       categoryId: 'stadiums',
-      prompt: 'Where is Johan Cruyff Arena, home of Ajax?',
+      prompt: 'Where is Johan Cruyff Arena Home Of Ajax?',
       lat: 52.3143,
       lng: 4.9414,
     ),
     Question(
       id: 'estadio_da_luz',
       categoryId: 'stadiums',
-      prompt: 'Where is Estádio da Luz, home of Benfica?',
+      prompt: 'Where is Estádio Da Luz Home Of Benfica?',
       lat: 38.7530,
       lng: -9.1848,
     ),
     Question(
       id: 'metlife_stadium',
       categoryId: 'stadiums',
-      prompt: 'Where is MetLife Stadium, near New York City?',
+      prompt: 'Where is Metlife Stadium Near New York City?',
       lat: 40.8135,
       lng: -74.0745,
     ),
     Question(
       id: 'lusail_stadium',
       categoryId: 'stadiums',
-      prompt: 'Where is Lusail Stadium, the 2022 World Cup final venue?',
+      prompt: 'Where is Lusail Stadium The 2022 World Cup Final Venue?',
       lat: 25.4207,
       lng: 51.4904,
     ),
     Question(
       id: 'atatürk_olympic_stadium',
       categoryId: 'stadiums',
-      prompt: 'Where is Atatürk Olympic Stadium, famous for the 2005 UCL Final?',
+      prompt: 'Where is Atatürk Olympic Stadium Famous For The 2005 Ucl Final?',
       lat: 41.0703,
       lng: 28.7656,
     ),
@@ -2008,126 +2109,126 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'lhr_heathrow',
       categoryId: 'airports',
-      prompt: 'Where is London Heathrow Airport (LHR)?',
+      prompt: 'Where is London Heathrow Airport Lhr?',
       lat: 51.4700,
       lng: -0.4543,
     ),
     Question(
       id: 'jfk_new_york',
       categoryId: 'airports',
-      prompt: 'Where is John F. Kennedy International Airport (JFK)?',
+      prompt: 'Where is John F Kennedy International Airport Jfk?',
       lat: 40.6413,
       lng: -73.7781,
     ),
     Question(
       id: 'sin_changi',
       categoryId: 'airports',
-      prompt: 'Where is Singapore Changi Airport (SIN)?',
+      prompt: 'Where is Singapore Changi Airport Sin?',
       lat: 1.3644,
       lng: 103.9915,
     ),
     Question(
       id: 'dxb_dubai',
       categoryId: 'airports',
-      prompt: 'Where is Dubai International Airport (DXB)?',
+      prompt: 'Where is Dubai International Airport Dxb?',
       lat: 25.2532,
       lng: 55.3657,
     ),
     Question(
       id: 'ist_istanbul',
       categoryId: 'airports',
-      prompt: 'Where is Istanbul Airport (IST)?',
+      prompt: 'Where is Istanbul Airport Ist?',
       lat: 41.2621,
       lng: 28.7276,
     ),
     Question(
       id: 'cdg_paris',
       categoryId: 'airports',
-      prompt: 'Where is Paris Charles de Gaulle Airport (CDG)?',
+      prompt: 'Where is Paris Charles De Gaulle Airport Cdg?',
       lat: 49.0097,
       lng: 2.5479,
     ),
     Question(
       id: 'lax_los_angeles',
       categoryId: 'airports',
-      prompt: 'Where is Los Angeles International Airport (LAX)?',
+      prompt: 'Where is Los Angeles International Airport Lax?',
       lat: 33.9416,
       lng: -118.4085,
     ),
     Question(
       id: 'hnd_haneda',
       categoryId: 'airports',
-      prompt: 'Where is Tokyo Haneda Airport (HND)?',
+      prompt: 'Where is Tokyo Haneda Airport Hnd?',
       lat: 35.5494,
       lng: 139.7798,
     ),
     Question(
       id: 'ams_schiphol',
       categoryId: 'airports',
-      prompt: 'Where is Amsterdam Schiphol Airport (AMS)?',
+      prompt: 'Where is Amsterdam Schiphol Airport Ams?',
       lat: 52.3105,
       lng: 4.7683,
     ),
     Question(
       id: 'fra_frankfurt',
       categoryId: 'airports',
-      prompt: 'Where is Frankfurt Airport (FRA)?',
+      prompt: 'Where is Frankfurt Airport Fra?',
       lat: 50.0379,
       lng: 8.5622,
     ),
     Question(
       id: 'atl_atlanta',
       categoryId: 'airports',
-      prompt: 'Where is Hartsfield-Jackson Atlanta International Airport (ATL)?',
+      prompt: 'Where is Hartsfield-Jackson Atlanta International Airport Atl?',
       lat: 33.6407,
       lng: -84.4277,
     ),
     Question(
       id: 'icn_incheon',
       categoryId: 'airports',
-      prompt: 'Where is Incheon International Airport (ICN)?',
+      prompt: 'Where is Incheon International Airport Icn?',
       lat: 37.4602,
       lng: 126.4407,
     ),
     Question(
       id: 'hkg_hong_kong',
       categoryId: 'airports',
-      prompt: 'Where is Hong Kong International Airport (HKG)?',
+      prompt: 'Where is Hong Kong International Airport Hkg?',
       lat: 22.3080,
       lng: 113.9185,
     ),
     Question(
       id: 'doh_hamad',
       categoryId: 'airports',
-      prompt: 'Where is Hamad International Airport (DOH)?',
+      prompt: 'Where is Hamad International Airport Doh?',
       lat: 25.2731,
       lng: 51.6081,
     ),
     Question(
       id: 'sfo_san_francisco',
       categoryId: 'airports',
-      prompt: 'Where is San Francisco International Airport (SFO)?',
+      prompt: 'Where is San Francisco International Airport Sfo?',
       lat: 37.6213,
       lng: -122.3790,
     ),
     Question(
       id: 'ord_ohare',
       categoryId: 'airports',
-      prompt: 'Where is Chicago O\'Hare International Airport (ORD)?',
+      prompt: 'Where is Chicago OHare International Airport?',
       lat: 41.9742,
       lng: -87.9073,
     ),
     Question(
       id: 'mad_barajas',
       categoryId: 'airports',
-      prompt: 'Where is Adolfo Suárez Madrid–Barajas Airport (MAD)?',
+      prompt: 'Where is Adolfo Suárez Madridbarajas Airport Mad?',
       lat: 40.4983,
       lng: -3.5676,
     ),
     Question(
       id: 'den_denver',
       categoryId: 'airports',
-      prompt: 'Where is Denver International Airport (DEN)?',
+      prompt: 'Where is Denver International Airport Den?',
       lat: 39.8561,
       lng: -104.6737,
     ),
@@ -2199,7 +2300,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'us_georgia',
       categoryId: 'us_states',
-      prompt: 'Where is Georgia (US)?',
+      prompt: 'Where is Georgia Us?',
       lat: 32.1656,
       lng: -82.9001,
     ),
@@ -2353,7 +2454,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'us_new_york',
       categoryId: 'us_states',
-      prompt: 'Where is New York (state)?',
+      prompt: 'Where is New York State?',
       lat: 43.2994,
       lng: -74.2179,
     ),
@@ -2458,7 +2559,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'us_washington',
       categoryId: 'us_states',
-      prompt: 'Where is Washington (state)?',
+      prompt: 'Where is Washington State?',
       lat: 47.7511,
       lng: -120.7401,
     ),
@@ -2505,7 +2606,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'washington',
       categoryId: 'capitals',
-      prompt: 'Where is Washington D.C.?',
+      prompt: 'Where is Washington Dc?',
       lat: 38.9072,
       lng: -77.0369,
     ),
@@ -2778,7 +2879,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'blue_mosque',
       categoryId: 'monuments',
-      prompt: 'Where is the Blue Mosque (Sultan Ahmed Mosque)?',
+      prompt: 'Where is Blue Mosque?',
       lat: 41.0054,
       lng: 28.9768,
     ),
@@ -2792,7 +2893,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'kremlin_red_square',
       categoryId: 'monuments',
-      prompt: 'Where are the Kremlin and Red Square?',
+      prompt: 'Where is the kremlin and red square?',
       lat: 55.7539,
       lng: 37.6208,
     ),
@@ -2813,21 +2914,21 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'cn_tower',
       categoryId: 'monuments',
-      prompt: 'Where is the CN Tower?',
+      prompt: 'Where is the cn tower?',
       lat: 43.6426,
       lng: -79.3871,
     ),
     Question(
       id: 'gateway_arch',
       categoryId: 'monuments',
-      prompt: 'Where is the Gateway Arch?',
+      prompt: 'Where is the gateway arch?',
       lat: 38.6247,
       lng: -90.1848,
     ),
     Question(
       id: 'uluru',
       categoryId: 'monuments',
-      prompt: 'Where is Uluru (Ayers Rock)?',
+      prompt: 'Where is Uluru Ayers Rock?',
       lat: -25.3444,
       lng: 131.0369,
     ),
@@ -2848,7 +2949,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'matterhorn',
       categoryId: 'monuments',
-      prompt: 'Where is the Matterhorn?',
+      prompt: 'Where is the matterhorn?',
       lat: 45.9763,
       lng: 7.6586,
     ),
@@ -2862,14 +2963,14 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'blue_lagoon',
       categoryId: 'monuments',
-      prompt: 'Where is the Blue Lagoon in Iceland?',
+      prompt: 'Where is the blue lagoon in iceland?',
       lat: 63.8804,
       lng: -22.4495,
     ),
     Question(
       id: 'alhambra',
       categoryId: 'monuments',
-      prompt: 'Where is the Alhambra?',
+      prompt: 'Where is the alhambra?',
       lat: 37.1761,
       lng: -3.5881,
     ),
@@ -2883,7 +2984,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'pisa_tower',
       categoryId: 'monuments',
-      prompt: 'Where is the Leaning Tower of Pisa?',
+      prompt: 'Where is the leaning tower of pisa?',
       lat: 43.7230,
       lng: 10.3966,
     ),
@@ -2897,7 +2998,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'moai_easter_island',
       categoryId: 'monuments',
-      prompt: 'Where are the Moai statues on Easter Island?',
+      prompt: 'Where is the moai statues on easter island?',
       lat: -27.1212,
       lng: -109.3664,
     ),
@@ -2920,7 +3021,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'usa',
       categoryId: 'america',
-      prompt: 'Where is the United States?',
+      prompt: 'Where is United States?',
       lat: 39.8283,
       lng: -98.5795,
       isPolygonBased: true,
@@ -3229,7 +3330,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'bosnia_and_herzegovina',
       categoryId: 'europe_1',
-      prompt: 'Where is Bosnia and Herzegovina?',
+      prompt: 'Where is Bosnia And Herzegovina?',
       lat: 43.9159,
       lng: 17.6791,
       isPolygonBased: true,
@@ -3439,7 +3540,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'netherlands',
       categoryId: 'europe_2',
-      prompt: 'Where is the Netherlands?',
+      prompt: 'Where is the netherlands?',
       lat: 52.1326,
       lng: 5.2913,
       isPolygonBased: true,
@@ -3567,7 +3668,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'united_kingdom',
       categoryId: 'europe_2',
-      prompt: 'Where is the United Kingdom?',
+      prompt: 'Where is the united kingdom?',
       lat: 55.3781,
       lng: -3.4360,
       isPolygonBased: true,
@@ -3840,7 +3941,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'philippines',
       categoryId: 'asia',
-      prompt: 'Where is the Philippines?',
+      prompt: 'Where is the philippines?',
       lat: 12.8797,
       lng: 121.7740,
       isPolygonBased: true,
@@ -3936,7 +4037,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'united_arab_emirates',
       categoryId: 'asia',
-      prompt: 'Where is the United Arab Emirates?',
+      prompt: 'Where is the united arab emirates?',
       lat: 23.4241,
       lng: 53.8478,
       isPolygonBased: true,
@@ -4034,7 +4135,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'central_african_republic',
       categoryId: 'africa',
-      prompt: 'Where is the Central African Republic?',
+      prompt: 'Where is the central african republic?',
       lat: 6.6111,
       lng: 20.9394,
       isPolygonBased: true,
@@ -4058,7 +4159,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'democratic_republic_of_the_congo',
       categoryId: 'africa',
-      prompt: 'Where is the Democratic Republic of the Congo?',
+      prompt: 'Where is the democratic republic of the congo?',
       lat: -4.0383,
       lng: 21.7587,
       isPolygonBased: true,
@@ -4066,7 +4167,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'republic_of_the_congo',
       categoryId: 'africa',
-      prompt: 'Where is the Republic of the Congo?',
+      prompt: 'Where is the republic of the congo?',
       lat: -0.2280,
       lng: 15.8277,
       isPolygonBased: true,
@@ -4130,7 +4231,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'gambia',
       categoryId: 'africa',
-      prompt: 'Where is The Gambia?',
+      prompt: 'Where is the gambia?',
       lat: 13.4432,
       lng: -15.3101,
       isPolygonBased: true,
@@ -4290,7 +4391,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'sao_tome_and_principe',
       categoryId: 'africa',
-      prompt: 'Where is São Tomé and Príncipe?',
+      prompt: 'Where is São Tomé And Príncipe?',
       lat: 0.1864,
       lng: 6.6131,
       isPolygonBased: true,
@@ -4436,7 +4537,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'solomon_islands',
       categoryId: 'oceania',
-      prompt: 'Where are the Solomon Islands?',
+      prompt: 'Where is the solomon islands?',
       lat: -9.6457,
       lng: 160.1562,
       isPolygonBased: true,
@@ -4476,7 +4577,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'micronesia',
       categoryId: 'oceania',
-      prompt: 'Where is Micronesia (Federated States of)?',
+      prompt: 'Where is Micronesia Federated States Of?',
       lat: 7.4256,
       lng: 150.5508,
       isPolygonBased: true,
@@ -4484,7 +4585,7 @@ final questionsProvider = Provider<List<Question>>((ref) {
     Question(
       id: 'marshall_islands',
       categoryId: 'oceania',
-      prompt: 'Where are the Marshall Islands?',
+      prompt: 'Where is the marshall islands?',
       lat: 7.1315,
       lng: 171.1845,
       isPolygonBased: true,
@@ -4742,43 +4843,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   // Polygon içinde nokta kontrolü (Ray Casting Algorithm)
-  bool _isPointInPolygon(LatLng point, List<LatLng> polygon) {
-    int intersectCount = 0;
-    for (int i = 0; i < polygon.length; i++) {
-      LatLng vertex1 = polygon[i];
-      LatLng vertex2 = polygon[(i + 1) % polygon.length];
-
-      if (_rayCastIntersect(point, vertex1, vertex2)) {
-        intersectCount++;
-      }
-    }
-    return (intersectCount % 2) == 1; // Tek sayıda kesişim = içeride
-  }
-
-  bool _rayCastIntersect(LatLng point, LatLng vertexA, LatLng vertexB) {
-    double px = point.longitude;
-    double py = point.latitude;
-    double ax = vertexA.longitude;
-    double ay = vertexA.latitude;
-    double bx = vertexB.longitude;
-    double by = vertexB.latitude;
-
-    if (ay > by) {
-      ax = vertexB.longitude;
-      ay = vertexB.latitude;
-      bx = vertexA.longitude;
-      by = vertexA.latitude;
-    }
-
-    if (py == ay || py == by) py += 0.00000001;
-    if ((py > by || py < ay) || (px > (ax > bx ? ax : bx))) return false;
-    if (px < (ax < bx ? ax : bx)) return true;
-
-    double red = (py - ay) / (by - ay);
-    double blue = (px - ax) / (bx - ax);
-    return blue >= red;
-  }
-
+  
   void _resetMapView() {
     // Ülkeler ve polygon-based kategorilerde haritayı resetleme - hile olmasın!
     if (widget.categoryId == 'countries' || 
@@ -4891,8 +4956,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       point: game.target,
                       radius: 80,
                       color: game.hasAnswered && game.currentAnswer?.score == 1000 
-                          ? Colors.green.withOpacity(0.4) 
-                          : Colors.blue.withOpacity(0.3),
+                          ? Colors.green.withValues(alpha: 0.4) 
+                          : Colors.blue.withValues(alpha: 0.3),
                       borderColor: game.hasAnswered && game.currentAnswer?.score == 1000 
                           ? Colors.green 
                           : Colors.blue,
@@ -4941,7 +5006,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         _getPinBottomPoint(game.target),
                       ],
                       strokeWidth: 3,
-                      color: Colors.purpleAccent.withOpacity(0.8),
+                      color: Colors.purpleAccent.withValues(alpha: 0.8),
                     ),
                   ],
                 ),
@@ -4962,7 +5027,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -4986,15 +5051,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 20,
                     spreadRadius: 0,
                   ),
@@ -5009,7 +5074,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       // Geri butonu
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -5045,7 +5110,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          'Score: ${game.totalScore}',
+                          '${AppLocalizations().get('score')}: ${game.totalScore}',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -5063,12 +5128,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              game.currentQuestion.prompt,
+                              game.currentQuestion.getLocalizedPrompt(),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -5085,7 +5149,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       // Pusula butonu - Haritayı kuzeye çevir
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -5118,7 +5182,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 if (!game.hasAnswered) ...[
                   if (game.userGuess == null)
                     BlinkingText(
-                      text: 'Tap on the map to select your guess point.',
+                      text: AppLocalizations().get('tap_map_to_select'),
                       color: Colors.green,
                       fontSize: 18.0,
                     )
@@ -5157,9 +5221,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         
                         _showResultDialog(context, ref);
                       },
-                      child: const Text(
-                        'Guess',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations().get('guess'),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -5188,7 +5252,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               _resetMapView();
                             },
                             icon: const Icon(Icons.arrow_back, size: 18),
-                            label: const Text('Previous'),
+                            label: Text(AppLocalizations().get('previous')),
                           ),
                         ),
                       if (!game.isFirstQuestion) const SizedBox(width: 12),
@@ -5222,7 +5286,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             }
                           },
                           child: Text(
-                            game.isLastQuestion ? 'Complete' : 'Continue',
+                            game.isLastQuestion ? AppLocalizations().get('close') : AppLocalizations().get('continue'),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -5251,17 +5315,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     showDialog<void>(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.42),
+      barrierColor: Colors.black.withValues(alpha: 0.42),
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.42),
+              color: Colors.black.withValues(alpha: 0.42),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -5270,7 +5334,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Result',
+                  AppLocalizations().get('result'),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -5279,7 +5343,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '${km.toStringAsFixed(1)} km away!',
+                  '${km.toStringAsFixed(1)} ${AppLocalizations().get('km_away')}',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -5287,16 +5351,16 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your score: $score',
+                  '${AppLocalizations().get('your_score')} $score',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.blue,
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Green pin shows the correct location, red pin shows your guess.',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations().get('green_pin_shows_correct'),
+                  style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white70,
                   ),
@@ -5316,7 +5380,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Close'),
+                    child: Text(AppLocalizations().get('close')),
                   ),
                 ),
               ],
@@ -5353,7 +5417,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -5363,7 +5427,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.2),
+                    color: Colors.blue.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -5373,8 +5437,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Game Completed!',
+                Text(
+                  AppLocalizations().get('game_completed'),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -5402,8 +5466,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'Total Score',
+                      Text(
+                        AppLocalizations().get('total_score'),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
@@ -5421,7 +5485,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$percentage% success',
+                        '$percentage% ' + AppLocalizations().get('success'),
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.black87,
@@ -5436,7 +5500,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     Expanded(
                       child: StatCard(
                         icon: Icons.quiz,
-                        label: 'Questions',
+                        label: AppLocalizations().get('questions'),
                         value: '$totalQuestions',
                       ),
                     ),
@@ -5444,7 +5508,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     Expanded(
                       child: StatCard(
                         icon: Icons.star,
-                        label: 'Average',
+                        label: AppLocalizations().get('average'),
                         value: (totalScore / totalQuestions).round().toString(),
                       ),
                     ),
@@ -5467,8 +5531,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       Navigator.of(context).pop(); // Dialog'u kapat
                       Navigator.of(context).pop(); // GameScreen'den çık
                     },
-                    child: const Text(
-                      'Back to Main Menu',
+                    child: Text(
+                      AppLocalizations().get('back_to_main_menu'),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
