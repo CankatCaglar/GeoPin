@@ -161,7 +161,7 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       titleKey: 'capitals_2',
       icon: Icons.location_city,
       isLocked: false,
-      backgroundImage: 'assets/images/capitals.jpg',
+      backgroundImage: 'assets/images/capitals2.jpg',
     ),
     // 5) Historical Landmarks (eski Historical Monuments, kilitsiz)
     Category(
@@ -257,7 +257,23 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       titleKey: 'us_states_2',
       icon: Icons.flag,
       isLocked: false,
-      backgroundImage: 'assets/images/us_states.jpg',
+      backgroundImage: 'assets/images/america_states2.jpg',
+    ),
+    // 16) US States 3
+    Category(
+      id: 'us_states_3',
+      titleKey: 'us_states_3',
+      icon: Icons.flag,
+      isLocked: false,
+      backgroundImage: 'assets/images/us_states3.jpg',
+    ),
+    // 17) US States 4
+    Category(
+      id: 'us_states_4',
+      titleKey: 'us_states_4',
+      icon: Icons.flag,
+      isLocked: false,
+      backgroundImage: 'assets/images/us_states4.jpg',
     ),
     // 11) Natural Wonders 1
     Category(
@@ -273,9 +289,17 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       titleKey: 'natural_wonders_2',
       icon: Icons.landscape,
       isLocked: false,
-      backgroundImage: 'assets/images/natural_wonders.jpg',
+      backgroundImage: 'assets/images/natural_wonders2.jpg',
     ),
-    // 13) Iconic Bridges
+    // 13) Natural Wonders 3
+    Category(
+      id: 'natural_wonders_3',
+      titleKey: 'natural_wonders_3',
+      icon: Icons.landscape,
+      isLocked: false,
+      backgroundImage: 'assets/images/natural_wonders3.jpg',
+    ),
+    // 14) Iconic Bridges
     Category(
       id: 'iconic_bridges',
       titleKey: 'iconic_bridges',
@@ -645,10 +669,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
               loc.get('general'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.white70,
+                color: Theme.of(context).textTheme.titleSmall?.color?.withOpacity(0.8),
               ),
             ),
           ),
@@ -722,10 +746,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
               loc.get('app'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.white70,
+                color: Theme.of(context).textTheme.titleSmall?.color?.withOpacity(0.8),
               ),
             ),
           ),
@@ -767,10 +791,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
               loc.get('legal'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.white70,
+                color: Theme.of(context).textTheme.titleSmall?.color?.withOpacity(0.8),
               ),
             ),
           ),
@@ -1011,21 +1035,36 @@ class _CategoryCard extends ConsumerWidget {
                 builder: (_) => const OceaniaButtonGameScreen(),
               ),
             );
-          } else if (category.id == 'us_states_1' || category.id == 'us_states_2') {
+          } else if (category.id == 'us_states_1' ||
+              category.id == 'us_states_2' ||
+              category.id == 'us_states_3' ||
+              category.id == 'us_states_4') {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => UsStatesButtonGameScreen(
                   title: category.title,
-                  part: category.id == 'us_states_1' ? 1 : 2,
+                  part: category.id == 'us_states_1'
+                      ? 1
+                      : category.id == 'us_states_2'
+                          ? 2
+                          : category.id == 'us_states_3'
+                              ? 3
+                              : 4,
                 ),
               ),
             );
-          } else if (category.id == 'natural_wonders_1' || category.id == 'natural_wonders_2') {
+          } else if (category.id == 'natural_wonders_1' ||
+              category.id == 'natural_wonders_2' ||
+              category.id == 'natural_wonders_3') {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => NaturalWondersButtonGameScreen(
                   title: category.title,
-                  part: category.id == 'natural_wonders_1' ? 1 : 2,
+                  part: category.id == 'natural_wonders_1'
+                      ? 1
+                      : category.id == 'natural_wonders_2'
+                          ? 2
+                          : 3,
                 ),
               ),
             );

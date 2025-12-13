@@ -10,8 +10,8 @@ import 'app_localizations.dart';
 class NaturalWondersButtonGameScreen extends ConsumerStatefulWidget {
   const NaturalWondersButtonGameScreen({super.key, required this.title, required this.part});
 
-  final String title; // AppLocalizations().get('natural_wonders_1') veya AppLocalizations().get('natural_wonders_2')
-  final int part; // 1 veya 2
+  final String title; // AppLocalizations().get('natural_wonders_1/2/3')
+  final int part; // 1..3
 
   @override
   ConsumerState<NaturalWondersButtonGameScreen> createState() => _NaturalWondersButtonGameScreenState();
@@ -30,14 +30,13 @@ class _NaturalWondersButtonGameScreenState extends ConsumerState<NaturalWondersB
     final allNaturalQuestions =
         allQuestions.where((q) => q.categoryId == 'natural_wonders').toList();
 
-    // 40 soruyu iki parçaya böl
-    final mid = (allNaturalQuestions.length / 2).ceil();
-    final List<Question> wondersQuestions;
-    if (widget.part == 1) {
-      wondersQuestions = allNaturalQuestions.sublist(0, mid);
-    } else {
-      wondersQuestions = allNaturalQuestions.sublist(mid);
-    }
+    // Soruları 3 parçaya böl (sıraya göre, olabildiğince eşit)
+    final total = allNaturalQuestions.length;
+    final chunkSize = (total / 3).ceil();
+    final start = chunkSize * (widget.part - 1);
+    final end = (start + chunkSize) > total ? total : (start + chunkSize);
+    final List<Question> wondersQuestions =
+        start >= total ? <Question>[] : allNaturalQuestions.sublist(start, end);
 
     final totalQuestions = wondersQuestions.length;
 
@@ -142,7 +141,12 @@ class _NaturalWondersButtonGameScreenState extends ConsumerState<NaturalWondersB
             Navigator.of(context).pop();
           },
         ),
-        title: Text(AppLocalizations().get(widget.part == 1 ? 'natural_wonders_1' : 'natural_wonders_2')),
+        title: Text(AppLocalizations().get(
+            widget.part == 1
+                ? 'natural_wonders_1'
+                : widget.part == 2
+                    ? 'natural_wonders_2'
+                    : 'natural_wonders_3')),
         centerTitle: true,
       ),
       body: Stack(

@@ -11,7 +11,7 @@ class UsStatesButtonGameScreen extends ConsumerStatefulWidget {
   const UsStatesButtonGameScreen({super.key, required this.title, required this.part});
 
   final String title; // AppLocalizations().get('us_states_1') veya AppLocalizations().get('us_states_2')
-  final int part; // 1 veya 2
+  final int part; // 1..4
 
   @override
   ConsumerState<UsStatesButtonGameScreen> createState() => _UsStatesButtonGameScreenState();
@@ -30,14 +30,13 @@ class _UsStatesButtonGameScreenState extends ConsumerState<UsStatesButtonGameScr
     final allUsStatesQuestions =
         allQuestions.where((q) => q.categoryId == 'us_states').toList();
 
-    // US States sorularını iki parçaya böl (yaklaşık yarı yarıya, sıraya göre)
-    final mid = (allUsStatesQuestions.length / 2).ceil();
-    final List<Question> usStatesQuestions;
-    if (widget.part == 1) {
-      usStatesQuestions = allUsStatesQuestions.sublist(0, mid);
-    } else {
-      usStatesQuestions = allUsStatesQuestions.sublist(mid);
-    }
+    // US States sorularını 4 parçaya böl (sıraya göre, olabildiğince eşit)
+    final total = allUsStatesQuestions.length;
+    final chunkSize = (total / 4).ceil();
+    final start = chunkSize * (widget.part - 1);
+    final end = (start + chunkSize) > total ? total : (start + chunkSize);
+    final List<Question> usStatesQuestions =
+        start >= total ? <Question>[] : allUsStatesQuestions.sublist(start, end);
 
     final totalQuestions = usStatesQuestions.length;
 
