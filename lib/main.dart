@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'stat_card.dart';
 import 'background_music_service.dart';
 import 'theme_provider.dart';
+import 'premium_provider.dart';
 import 'america_button_game.dart';
 import 'europe_button_game.dart';
 import 'asia_button_game.dart';
@@ -17,10 +19,18 @@ import 'world_cuisine_button_game.dart';
 import 'stadiums_button_game.dart';
 import 'airports_button_game.dart';
 import 'app_localizations.dart';
+import 'paywall_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppLocalizations().initialize();
+  
+  await Purchases.configure(
+    PurchasesConfiguration('appl_jkIjDYkOJEWviaBULUAEohpHxkM')
+      ..appUserID = null
+      ..observerMode = false,
+  );
+  
   runApp(const ProviderScope(child: GeoPinApp()));
 }
 
@@ -468,6 +478,90 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _isLoadingPurchase = false;
+
+  Future<void> _showPremiumPurchaseDialog(BuildContext context) async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const PaywallScreen(),
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _purchasePremium(Package package) async {
+    final loc = AppLocalizations();
+    setState(() => _isLoadingPurchase = true);
+
+    try {
+      final customerInfo = await Purchases.purchasePackage(package);
+      
+      debugPrint('Available entitlements: ${customerInfo.entitlements.all.keys}');
+      final isPremium = customerInfo.entitlements.all['premium_GeoPin']?.isActive ?? false;
+      
+      if (isPremium) {
+        ref.read(premiumProvider.notifier).refresh();
+      }
+      
+      setState(() {
+        _isLoadingPurchase = false;
+      });
+
+      if (!mounted) return;
+      
+      if (isPremium) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.celebration, color: Colors.amber),
+                const SizedBox(width: 8),
+                Text(loc.get('success')),
+              ],
+            ),
+            content: Text(loc.get('premium_purchase_success')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(loc.get('ok')),
+              ),
+            ],
+          ),
+        );
+      }
+    } on PlatformException catch (e) {
+      setState(() => _isLoadingPurchase = false);
+      
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${loc.get('purchase_failed')}: ${e.message}')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoadingPurchase = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${loc.get('error')}: $e')),
+      );
+    }
+  }
+
   void _showLanguageDialog(BuildContext context) {
     final loc = AppLocalizations();
     showDialog(
@@ -558,17 +652,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.workspace_premium, color: Colors.amber),
-            title: Text(loc.get('upgrade_to_premium')),
-            subtitle: Text(loc.get('upgrade_description')),
-            onTap: () {
-              HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.get('premium_upgrade_coming_soon'))),
-              );
-            },
-          ),
+          if (!ref.watch(premiumProvider))
+            ListTile(
+              leading: const Icon(Icons.workspace_premium, color: Colors.amber),
+              title: Text(loc.get('upgrade_to_premium')),
+              subtitle: Text(loc.get('upgrade_description')),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                _showPremiumPurchaseDialog(context);
+              },
+            )
+          else
+            ListTile(
+              leading: const Icon(Icons.check_circle, color: Colors.green),
+              title: Text(loc.get('premium_active')),
+              subtitle: Text(loc.get('premium_active_description')),
+              enabled: false,
+            ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.language),
@@ -854,13 +954,17 @@ class _CategoryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLocked = category.isLocked;
+    final isPremiumUser = ref.watch(premiumProvider);
+    final isLocked = category.isLocked && !isPremiumUser;
+    final showPremiumBadge = category.isPremium && !isPremiumUser;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
         HapticFeedback.selectionClick();
-        if (isLocked || category.isPremium) {
+        if (showPremiumBadge) {
+          _showPremiumPurchaseDialog(context, ref);
+        } else if (isLocked) {
           _showPaywall(context, category);
         } else {
           // America, Europe, Asia ve Africa kategorileri için özel butonlu harita ekranlarını aç
@@ -1011,7 +1115,7 @@ class _CategoryCard extends ConsumerWidget {
                 ),
               ),
             ),
-            if (isLocked || category.isPremium)
+            if (showPremiumBadge)
               Positioned.fill(
                 child: Center(
                   child: Container(
@@ -1025,19 +1129,31 @@ class _CategoryCard extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.lock, size: 16, color: Colors.amber),
-                        if (category.id != 'monuments') ...[
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Premium',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amber,
-                            ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Premium',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber,
                           ),
-                        ],
+                        ),
                       ],
                     ),
+                  ),
+                ),
+              ),
+            if (isLocked && !showPremiumBadge)
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E7D32),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Icon(Icons.lock, size: 16, color: Colors.amber),
                   ),
                 ),
               ),
@@ -1047,99 +1163,21 @@ class _CategoryCard extends ConsumerWidget {
     );
   }
 
-  void _showPaywall(BuildContext context, Category category) {
-    final loc = AppLocalizations();
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.grey.shade900,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  Future<void> _showPremiumPurchaseDialog(BuildContext context, WidgetRef ref) async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const PaywallScreen(),
       ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Icon(
-                Icons.lock,
-                color: Colors.amber,
-                size: 48,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                loc.get('upgrade_to_premium'),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                loc.get('upgrade_description'),
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52),
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  // Settings ekranına yönlendir
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const SettingsScreen(),
-                    ),
-                  );
-                },
-                child: Text(
-                  loc.get('upgrade_to_premium'),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  loc.get('cancel'),
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    );
+  }
+
+  void _showPaywall(BuildContext context, Category category) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const PaywallScreen(),
+      ),
     );
   }
 }
