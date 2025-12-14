@@ -262,37 +262,42 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         const SizedBox(height: 32),
                         // Feature List (Card)
                         Container(
+                          height: 250,
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             border: Border.all(color: Theme.of(context).dividerColor),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Column(
-                            children: [
-                              _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Sınırsız konum kaydetme' : 'Unlimited location saves'),
-                              const SizedBox(height: 16),
-                              _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Tüm premium kategorilere erişim' : 'Access to all premium categories'),
-                              const SizedBox(height: 16),
-                              _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Reklamsız deneyim' : 'Ad-free experience'),
-                              const SizedBox(height: 16),
-                              _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Gelişmiş harita özellikleri' : 'Advanced map features'),
-                              const SizedBox(height: 16),
-                              _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Öncelikli müşteri desteği' : 'Priority customer support'),
-                            ],
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'İkonik Köprüler' : 'Iconic Bridges'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'En Yüksek Gökdelenler' : 'Tallest Skyscrapers'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Dünya Mutfağı' : 'World Cuisine'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Stadyumlar' : 'Stadiums'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Havaalanları' : 'Airports'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Uzay Üsleri' : 'Space Bases'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Teknoloji Merkezleri' : 'Tech Hubs'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Bilimsel Harikalar' : 'Scientific Wonders'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Endemik Hayvanlar' : 'Endemic Animals'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Ekstrem Noktalar' : 'Extreme Points'),
+                                const SizedBox(height: 16),
+                                _buildFeatureRow(loc.currentLanguage == 'tr' ? 'Volkanlar' : 'Volcanoes'),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(height: 32),
-                        // Auto-renew text (or Lifetime payment text)
-                        Text(
-                          loc.currentLanguage == 'tr' ? 'Abonelik otomatik olarak yenilenir' : 'Subscription automatically renews',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
                         // Purchase Button
                         SizedBox(
                           width: double.infinity,
@@ -340,9 +345,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           children: [
                             _buildFooterLink(loc.currentLanguage == 'tr' ? 'Satın Alımları Geri Yükle' : 'Restore Purchases', () => _restorePurchases()),
                             _buildFooterDivider(),
-                            _buildFooterLink(loc.currentLanguage == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use', () => _launchUrl('https://geopin-app.com/terms')),
+                            _buildFooterLink(loc.currentLanguage == 'tr' ? 'Kullanım Koşulları' : 'Terms of Use', () => _launchUrl('https://cankatcaglar.github.io/geopin-pages/terms-of-use.html')),
                             _buildFooterDivider(),
-                            _buildFooterLink(loc.currentLanguage == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy', () => _launchUrl('https://geopin-app.com/privacy')),
+                            _buildFooterLink(loc.currentLanguage == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy', () => _launchUrl('https://cankatcaglar.github.io/geopin-pages/privacy-policy.html')),
                           ],
                         ),
                         const SizedBox(height: 24),

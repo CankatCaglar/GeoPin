@@ -4,9 +4,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'stat_card.dart';
 import 'background_music_service.dart';
 import 'theme_provider.dart';
+import 'music_provider.dart';
 import 'premium_provider.dart';
 import 'america_button_game.dart';
 import 'europe_button_game.dart';
@@ -18,6 +20,7 @@ import 'natural_wonders_button_game.dart';
 import 'world_cuisine_button_game.dart';
 import 'stadiums_button_game.dart';
 import 'airports_button_game.dart';
+import 'generic_button_game.dart';
 import 'app_localizations.dart';
 import 'paywall_screen.dart';
 
@@ -119,7 +122,10 @@ class Question {
   // Prompt'u çeviri anahtarına dönüştür
   String _promptToKey(String prompt) {
     String key = prompt.toLowerCase();
-    key = key.replaceAll('where is ', 'q_').replaceAll('where are ', 'q_');
+    // Tüm soru formatlarını 'q_' ile başlat
+    key = key.replaceAll('where is ', 'q_')
+             .replaceAll('where are ', 'q_')
+             .replaceAll('where do ', 'q_');
     key = key.replaceAll('?', '').replaceAll("'", '').replaceAll('"', '');
     key = key.replaceAll(' ', '_').replaceAll(',', '').replaceAll('(', '').replaceAll(')', '');
     key = key.replaceAll('.', '').replaceAll('–', '').replaceAll(''', '').replaceAll(''', '');
@@ -344,6 +350,54 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       backgroundImage: 'assets/images/airports.jpg',
       isPremium: true,
     ),
+    Category(
+      id: 'space_bases',
+      titleKey: 'space_bases',
+      icon: Icons.rocket_launch,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/space_bases.jpg',
+    ),
+    Category(
+      id: 'tech_hubs',
+      titleKey: 'tech_hubs',
+      icon: Icons.memory,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/spacehubs.jpg',
+    ),
+    Category(
+      id: 'scientific_wonders',
+      titleKey: 'scientific_wonders',
+      icon: Icons.science,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/scientifiwonders.jpg',
+    ),
+    Category(
+      id: 'endemic_animals',
+      titleKey: 'endemic_animals',
+      icon: Icons.pets,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/endemic_animals.jpg',
+    ),
+    Category(
+      id: 'extreme_points',
+      titleKey: 'extreme_points',
+      icon: Icons.thermostat,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/extreme_places.jpg',
+    ),
+    Category(
+      id: 'volcanoes',
+      titleKey: 'volcanoes',
+      icon: Icons.local_fire_department,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/volcanoes.jpg',
+    ),
   ];
 });
 
@@ -388,7 +442,7 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward();
 
     // Navigate to main screen after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
@@ -434,6 +488,11 @@ class _SplashScreenState extends State<SplashScreen>
                       height: 120,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
+                        gradient: LinearGradient(
+                          colors: [Colors.blue.shade600, Colors.blue.shade900],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.25),
@@ -444,8 +503,17 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: Image.asset(
-                        'assets/images/app_icon.png', // Yeni ana ikon görselin
+                        'assets/images/app_icon.png',
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Icon(
+                              Icons.public,
+                              size: 60,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -471,18 +539,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 60),
                     // Loading indicator
-                    SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 3,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).brightness == Brightness.dark 
-                              ? Colors.blue.shade400 
-                              : Colors.blue.shade600,
-                        ),
-                      ),
-                    ),
+                    const SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -723,22 +780,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
           const Divider(height: 1),
-          StatefulBuilder(
-            builder: (context, setState) {
-              bool musicOn = BackgroundMusicService.instance.isEnabled;
-              return SwitchListTile(
-                secondary: const Icon(Icons.music_note),
-                title: Text(loc.get('music')),
-                subtitle: Text(loc.get('music_description')),
-                value: musicOn,
-                onChanged: (value) async {
-                  HapticFeedback.selectionClick();
-                  await BackgroundMusicService.instance.setEnabled(value);
-                  setState(() {
-                    musicOn = value;
-                  });
-                },
-              );
+          SwitchListTile(
+            secondary: const Icon(Icons.music_note),
+            title: Text(loc.get('music')),
+            subtitle: Text(loc.get('music_description')),
+            value: ref.watch(musicProvider),
+            onChanged: (value) {
+              HapticFeedback.selectionClick();
+              ref.read(musicProvider.notifier).setEnabled(value);
             },
           ),
           const SizedBox(height: 16),
@@ -779,11 +828,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             leading: const Icon(Icons.email),
             title: Text(loc.get('contact_us')),
             subtitle: Text(loc.get('contact_description')),
-            onTap: () {
+            onTap: () async {
               HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.get('contact_flow_coming_soon'))),
-              );
+              final url = Uri.parse('https://cankatcaglar.github.io/geopin-pages/contact.html');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
             },
           ),
           const SizedBox(height: 16),
@@ -801,22 +851,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.privacy_tip),
             title: Text(loc.get('privacy_policy')),
-            onTap: () {
+            onTap: () async {
               HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.get('privacy_policy_coming_soon'))),
-              );
+              final url = Uri.parse('https://cankatcaglar.github.io/geopin-pages/privacy-policy.html');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
             },
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.description),
             title: Text(loc.get('terms_of_use')),
-            onTap: () {
+            onTap: () async {
               HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.get('terms_of_use_coming_soon'))),
-              );
+              final url = Uri.parse('https://cankatcaglar.github.io/geopin-pages/terms-of-use.html');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
             },
           ),
           const SizedBox(height: 16),
@@ -857,7 +909,10 @@ class CategoryScreen extends ConsumerWidget {
     
     final premiumContent = categories.where((c) => 
       c.id == 'iconic_bridges' || c.id == 'tallest_skyscrapers' || 
-      c.id == 'world_cuisine' || c.id == 'stadiums' || c.id == 'airports'
+      c.id == 'world_cuisine' || c.id == 'stadiums' || c.id == 'airports' ||
+      c.id == 'space_bases' || c.id == 'tech_hubs' || 
+      c.id == 'scientific_wonders' || c.id == 'endemic_animals' || 
+      c.id == 'extreme_points' || c.id == 'volcanoes'
     ).toList();
 
     return Scaffold(
@@ -1086,6 +1141,21 @@ class _CategoryCard extends ConsumerWidget {
                 builder: (_) => const AirportsButtonGameScreen(),
               ),
             );
+          } else if (category.id == 'space_bases' ||
+              category.id == 'tech_hubs' ||
+              category.id == 'scientific_wonders' ||
+              category.id == 'endemic_animals' ||
+              category.id == 'extreme_points' ||
+              category.id == 'volcanoes') {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => GenericButtonGameScreen(
+                  categoryId: category.id,
+                  title: category.title,
+                  icon: category.icon,
+                ),
+              ),
+            );
           } else {
             final questions = ref.read(questionsProvider);
             // Filter questions for this category
@@ -1115,19 +1185,38 @@ class _CategoryCard extends ConsumerWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          image: category.backgroundImage != null
-              ? DecorationImage(
-                  image: AssetImage(category.backgroundImage!),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withValues(alpha: 0.3),
-                    BlendMode.darken,
-                  ),
-                )
-              : null,
         ),
-        child: Stack(
-          children: [
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              if (category.backgroundImage != null)
+                Positioned.fill(
+                  child: Image.asset(
+                    category.backgroundImage!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.blue.shade700.withValues(alpha: 0.3),
+                        child: Center(
+                          child: Icon(
+                            category.icon,
+                            size: 48,
+                            color: Colors.white.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              if (category.backgroundImage != null)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.3),
+                    ),
+                  ),
+                ),
             // Kategori etiketi - kartın sol kenarına gömülü mat etiket
             Positioned(
               top: 10,
@@ -1199,6 +1288,7 @@ class _CategoryCard extends ConsumerWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -4814,6 +4904,426 @@ final questionsProvider = Provider<List<Question>>((ref) {
       lng: 177.6493,
       isPolygonBased: true,
     ),
+    Question(
+      id: 'space_kennedy_space_center',
+      categoryId: 'space_bases',
+      prompt: 'Where is Kennedy Space Center?',
+      lat: 28.5729,
+      lng: -80.6490,
+    ),
+    Question(
+      id: 'space_baikonur_cosmodrome',
+      categoryId: 'space_bases',
+      prompt: 'Where is Baikonur Cosmodrome?',
+      lat: 45.9647,
+      lng: 63.3050,
+    ),
+    Question(
+      id: 'space_vandenberg',
+      categoryId: 'space_bases',
+      prompt: 'Where is Vandenberg Space Force Base?',
+      lat: 34.7420,
+      lng: -120.5720,
+    ),
+    Question(
+      id: 'space_johnson_space_center',
+      categoryId: 'space_bases',
+      prompt: 'Where is Johnson Space Center?',
+      lat: 29.5594,
+      lng: -95.0892,
+    ),
+    Question(
+      id: 'space_guiana_space_centre',
+      categoryId: 'space_bases',
+      prompt: 'Where is Guiana Space Centre?',
+      lat: 5.2390,
+      lng: -52.7680,
+    ),
+    Question(
+      id: 'space_starbase',
+      categoryId: 'space_bases',
+      prompt: 'Where is SpaceX Starbase?',
+      lat: 25.9970,
+      lng: -97.1560,
+    ),
+    Question(
+      id: 'space_tanegashima',
+      categoryId: 'space_bases',
+      prompt: 'Where is Tanegashima Space Center?',
+      lat: 30.3750,
+      lng: 130.9650,
+    ),
+    Question(
+      id: 'space_satish_dhawan',
+      categoryId: 'space_bases',
+      prompt: 'Where is Satish Dhawan Space Centre?',
+      lat: 13.7330,
+      lng: 80.2330,
+    ),
+    Question(
+      id: 'space_jiuquan',
+      categoryId: 'space_bases',
+      prompt: 'Where is Jiuquan Satellite Launch Center?',
+      lat: 40.9600,
+      lng: 100.2980,
+    ),
+    Question(
+      id: 'space_wenchang',
+      categoryId: 'space_bases',
+      prompt: 'Where is Wenchang Space Launch Site?',
+      lat: 19.6140,
+      lng: 110.9510,
+    ),
+    Question(
+      id: 'tech_silicon_valley',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Silicon Valley?',
+      lat: 37.3870,
+      lng: -122.0570,
+    ),
+    Question(
+      id: 'tech_shenzhen',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Shenzhen?',
+      lat: 22.5431,
+      lng: 114.0579,
+    ),
+    Question(
+      id: 'tech_bangalore',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Bangalore?',
+      lat: 12.9716,
+      lng: 77.5946,
+    ),
+    Question(
+      id: 'tech_seoul_gangnam',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Gangnam (Seoul)?',
+      lat: 37.4979,
+      lng: 127.0276,
+    ),
+    Question(
+      id: 'tech_tel_aviv',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Tel Aviv?',
+      lat: 32.0853,
+      lng: 34.7818,
+    ),
+    Question(
+      id: 'tech_berlin',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Berlin?',
+      lat: 52.5200,
+      lng: 13.4050,
+    ),
+    Question(
+      id: 'tech_singapore',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Singapore?',
+      lat: 1.3521,
+      lng: 103.8198,
+    ),
+    Question(
+      id: 'tech_austin',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Austin?',
+      lat: 30.2672,
+      lng: -97.7431,
+    ),
+    Question(
+      id: 'tech_tokyo',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is Tokyo?',
+      lat: 35.6762,
+      lng: 139.6503,
+    ),
+    Question(
+      id: 'tech_london',
+      categoryId: 'tech_hubs',
+      prompt: 'Where is London?',
+      lat: 51.5074,
+      lng: -0.1278,
+    ),
+    Question(
+      id: 'science_cern',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is CERN?',
+      lat: 46.2330,
+      lng: 6.0550,
+    ),
+    Question(
+      id: 'science_svalbard_seed_vault',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is Svalbard Global Seed Vault?',
+      lat: 78.2350,
+      lng: 15.4910,
+    ),
+    Question(
+      id: 'science_ligo_livingston',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is LIGO Livingston Observatory?',
+      lat: 30.5630,
+      lng: -90.7740,
+    ),
+    Question(
+      id: 'science_ligo_hanford',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is LIGO Hanford Observatory?',
+      lat: 46.4550,
+      lng: -119.4080,
+    ),
+    Question(
+      id: 'science_keck_observatory',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is Keck Observatory?',
+      lat: 19.8260,
+      lng: -155.4740,
+    ),
+    Question(
+      id: 'science_vlt_paranal',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is Paranal Observatory (VLT)?',
+      lat: -24.6270,
+      lng: -70.4040,
+    ),
+    Question(
+      id: 'science_iter',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is ITER?',
+      lat: 43.6920,
+      lng: 5.7630,
+    ),
+    Question(
+      id: 'science_jodrell_bank',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is Jodrell Bank Observatory?',
+      lat: 53.2363,
+      lng: -2.3071,
+    ),
+    Question(
+      id: 'science_five_hundred_meter_aperture_spherical_telescope',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is FAST Telescope?',
+      lat: 25.6529,
+      lng: 106.8567,
+    ),
+    Question(
+      id: 'science_south_pole_station',
+      categoryId: 'scientific_wonders',
+      prompt: 'Where is Amundsen–Scott South Pole Station?',
+      lat: -90.0000,
+      lng: 0.0000,
+    ),
+    Question(
+      id: 'animal_lemurs_madagascar',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do lemurs live?',
+      lat: -18.7669,
+      lng: 46.8691,
+    ),
+    Question(
+      id: 'animal_kangaroos_australia',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do kangaroos live?',
+      lat: -25.2744,
+      lng: 133.7751,
+    ),
+    Question(
+      id: 'animal_komodo_dragon',
+      categoryId: 'endemic_animals',
+      prompt: 'Where is Komodo dragon found?',
+      lat: -8.5500,
+      lng: 119.4900,
+    ),
+    Question(
+      id: 'animal_galapagos_tortoise',
+      categoryId: 'endemic_animals',
+      prompt: 'Where is Galapagos tortoise found?',
+      lat: -0.9538,
+      lng: -90.9656,
+    ),
+    Question(
+      id: 'animal_kiwi_new_zealand',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do kiwi birds live?',
+      lat: -41.2865,
+      lng: 174.7762,
+    ),
+    Question(
+      id: 'animal_giant_panda',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do giant pandas live?',
+      lat: 31.2304,
+      lng: 103.4170,
+    ),
+    Question(
+      id: 'animal_bengal_tiger',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do Bengal tigers live?',
+      lat: 21.9497,
+      lng: 89.1833,
+    ),
+    Question(
+      id: 'animal_mountain_gorilla',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do mountain gorillas live?',
+      lat: -1.4850,
+      lng: 29.5900,
+    ),
+    Question(
+      id: 'animal_koala',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do koalas live?',
+      lat: -33.8688,
+      lng: 151.2093,
+    ),
+    Question(
+      id: 'animal_emperor_penguin',
+      categoryId: 'endemic_animals',
+      prompt: 'Where do emperor penguins live?',
+      lat: -77.8500,
+      lng: 166.6667,
+    ),
+    Question(
+      id: 'extreme_death_valley',
+      categoryId: 'extreme_points',
+      prompt: 'Where is Death Valley?',
+      lat: 36.5050,
+      lng: -116.8470,
+    ),
+    Question(
+      id: 'extreme_oymyakon',
+      categoryId: 'extreme_points',
+      prompt: 'Where is Oymyakon?',
+      lat: 63.4630,
+      lng: 142.7730,
+    ),
+    Question(
+      id: 'extreme_mariana_trench',
+      categoryId: 'extreme_points',
+      prompt: 'Where is the Mariana Trench?',
+      lat: 11.3500,
+      lng: 142.2000,
+    ),
+    Question(
+      id: 'extreme_north_pole',
+      categoryId: 'extreme_points',
+      prompt: 'Where is the North Pole?',
+      lat: 90.0000,
+      lng: 0.0000,
+    ),
+    Question(
+      id: 'extreme_south_pole',
+      categoryId: 'extreme_points',
+      prompt: 'Where is the South Pole?',
+      lat: -90.0000,
+      lng: 0.0000,
+    ),
+    Question(
+      id: 'extreme_atacama_desert',
+      categoryId: 'extreme_points',
+      prompt: 'Where is the Atacama Desert?',
+      lat: -24.5000,
+      lng: -69.2500,
+    ),
+    Question(
+      id: 'extreme_danakil_depression',
+      categoryId: 'extreme_points',
+      prompt: 'Where is the Danakil Depression?',
+      lat: 14.2410,
+      lng: 40.3000,
+    ),
+    Question(
+      id: 'extreme_lake_baikal',
+      categoryId: 'extreme_points',
+      prompt: 'Where is Lake Baikal?',
+      lat: 53.5587,
+      lng: 108.1650,
+    ),
+    Question(
+      id: 'extreme_mount_everest',
+      categoryId: 'extreme_points',
+      prompt: 'Where is Mount Everest?',
+      lat: 27.9881,
+      lng: 86.9250,
+    ),
+    Question(
+      id: 'extreme_dead_sea',
+      categoryId: 'extreme_points',
+      prompt: 'Where is the Dead Sea?',
+      lat: 31.5590,
+      lng: 35.4732,
+    ),
+    Question(
+      id: 'volcano_etna',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Mount Etna?',
+      lat: 37.7510,
+      lng: 14.9930,
+    ),
+    Question(
+      id: 'volcano_fuji',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Mount Fuji?',
+      lat: 35.3606,
+      lng: 138.7274,
+    ),
+    Question(
+      id: 'volcano_kilauea',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Kilauea?',
+      lat: 19.4210,
+      lng: -155.2870,
+    ),
+    Question(
+      id: 'volcano_vesuvius',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Mount Vesuvius?',
+      lat: 40.8210,
+      lng: 14.4260,
+    ),
+    Question(
+      id: 'volcano_krakatoa',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Krakatoa?',
+      lat: -6.1020,
+      lng: 105.4230,
+    ),
+    Question(
+      id: 'volcano_eyjafjallajokull',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Eyjafjallajokull?',
+      lat: 63.6330,
+      lng: -19.6200,
+    ),
+    Question(
+      id: 'volcano_popocatepetl',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Popocatepetl?',
+      lat: 19.0230,
+      lng: -98.6220,
+    ),
+    Question(
+      id: 'volcano_mauna_loa',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Mauna Loa?',
+      lat: 19.4750,
+      lng: -155.6080,
+    ),
+    Question(
+      id: 'volcano_stromboli',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Stromboli?',
+      lat: 38.7890,
+      lng: 15.2130,
+    ),
+    Question(
+      id: 'volcano_kilimanjaro',
+      categoryId: 'volcanoes',
+      prompt: 'Where is Mount Kilimanjaro?',
+      lat: -3.0674,
+      lng: 37.3556,
+    ),
   ];
 });
 
@@ -5135,6 +5645,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               TileLayer(
                 urlTemplate: (widget.categoryId == 'countries' || 
                              widget.categoryId == 'capitals' || 
+                             widget.categoryId == 'capitals_1' || 
+                             widget.categoryId == 'capitals_2' || 
                              widget.categoryId == 'america' ||
                              widget.categoryId == 'europe' ||
                              widget.categoryId == 'asia' ||
