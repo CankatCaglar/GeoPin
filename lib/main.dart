@@ -6,7 +6,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'stat_card.dart';
-import 'background_music_service.dart';
 import 'theme_provider.dart';
 import 'music_provider.dart';
 import 'premium_provider.dart';
@@ -42,7 +41,8 @@ class GeoPinApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    BackgroundMusicService.instance.play();
+    // Initialize music provider to load saved preference
+    ref.watch(musicProvider);
     final themeMode = ref.watch(themeProvider);
     
     return ListenableBuilder(
@@ -111,6 +111,8 @@ class Question {
       // Türkçe için çeviri ara
       final key = _promptToKey(prompt);
       final translated = AppLocalizations().get(key);
+      // Debug: print key and translation status
+      print('DEBUG: prompt="$prompt" key="$key" translated="$translated" lang=$currentLang');
       if (translated != key) {
         return translated;
       }
@@ -121,16 +123,25 @@ class Question {
   
   // Prompt'u çeviri anahtarına dönüştür
   String _promptToKey(String prompt) {
-    String key = prompt.toLowerCase();
+    String key = prompt.toLowerCase().trim();
     // Tüm soru formatlarını 'q_' ile başlat
     key = key.replaceAll('where is ', 'q_')
              .replaceAll('where are ', 'q_')
              .replaceAll('where do ', 'q_');
+    // Remove 'the' article (both with spaces and after q_)
+    key = key.replaceAll(' the ', ' ')
+             .replaceAll('the ', '')
+             .trim();
     key = key.replaceAll('?', '').replaceAll("'", '').replaceAll('"', '');
     key = key.replaceAll(' ', '_').replaceAll(',', '').replaceAll('(', '').replaceAll(')', '');
     key = key.replaceAll('.', '').replaceAll('–', '').replaceAll(''', '').replaceAll(''', '');
-    key = key.replaceAll('__', '_').trim();
-    return key.replaceAll('_', '_').replaceAll('__', '_');
+    // Clean up multiple underscores and trim
+    while (key.contains('__')) {
+      key = key.replaceAll('__', '_');
+    }
+    // Remove leading/trailing underscores
+    key = key.replaceAll(RegExp(r'^_+|_+$'), '');
+    return key;
   }
 }
 

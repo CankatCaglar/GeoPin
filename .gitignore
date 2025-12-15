@@ -46,3 +46,4 @@ app.*.map.json
 
 # Assets build files
 assets/images/build/
+assets/audio/*.mp3
