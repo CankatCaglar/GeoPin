@@ -111,8 +111,6 @@ class Question {
       // Türkçe için çeviri ara
       final key = _promptToKey(prompt);
       final translated = AppLocalizations().get(key);
-      // Debug: print key and translation status
-      print('DEBUG: prompt="$prompt" key="$key" translated="$translated" lang=$currentLang');
       if (translated != key) {
         return translated;
       }
@@ -408,6 +406,30 @@ final categoriesProvider = Provider<List<Category>>((ref) {
       isLocked: false,
       isPremium: true,
       backgroundImage: 'assets/images/volcanoes.jpg',
+    ),
+    Category(
+      id: 'f1_circuits',
+      titleKey: 'f1_circuits',
+      icon: Icons.sports_motorsports,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/formula1_circuits.jpg',
+    ),
+    Category(
+      id: 'famous_brands',
+      titleKey: 'famous_brands',
+      icon: Icons.business,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/world_famous_brands.jpg',
+    ),
+    Category(
+      id: 'famous_people',
+      titleKey: 'famous_people',
+      icon: Icons.person,
+      isLocked: false,
+      isPremium: true,
+      backgroundImage: 'assets/images/Famous_characters.jpg',
     ),
   ];
 });
@@ -923,7 +945,8 @@ class CategoryScreen extends ConsumerWidget {
       c.id == 'world_cuisine' || c.id == 'stadiums' || c.id == 'airports' ||
       c.id == 'space_bases' || c.id == 'tech_hubs' || 
       c.id == 'scientific_wonders' || c.id == 'endemic_animals' || 
-      c.id == 'extreme_points' || c.id == 'volcanoes'
+      c.id == 'extreme_points' || c.id == 'volcanoes' ||
+      c.id == 'f1_circuits' || c.id == 'famous_brands' || c.id == 'famous_people'
     ).toList();
 
     return Scaffold(
@@ -1157,7 +1180,10 @@ class _CategoryCard extends ConsumerWidget {
               category.id == 'scientific_wonders' ||
               category.id == 'endemic_animals' ||
               category.id == 'extreme_points' ||
-              category.id == 'volcanoes') {
+              category.id == 'volcanoes' ||
+              category.id == 'f1_circuits' ||
+              category.id == 'famous_brands' ||
+              category.id == 'famous_people') {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => GenericButtonGameScreen(
@@ -1245,7 +1271,7 @@ class _CategoryCard extends ConsumerWidget {
                 child: Text(
                   category.title,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -2532,6 +2558,327 @@ final questionsProvider = Provider<List<Question>>((ref) {
       prompt: 'Where is Denver International Airport Den?',
       lat: 39.8561,
       lng: -104.6737,
+    ),
+
+    // --- FORMULA 1 CIRCUITS ---
+    Question(
+      id: 'monaco_gp',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Monaco Grand Prix Circuit?',
+      lat: 43.7347,
+      lng: 7.4206,
+    ),
+    Question(
+      id: 'istanbul_park',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Istanbul Park Circuit?',
+      lat: 40.9517,
+      lng: 29.4050,
+    ),
+    Question(
+      id: 'silverstone',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Silverstone Circuit?',
+      lat: 52.0786,
+      lng: -1.0169,
+    ),
+    Question(
+      id: 'monza',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Monza Circuit?',
+      lat: 45.6156,
+      lng: 9.2811,
+    ),
+    Question(
+      id: 'spa_francorchamps',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Spa-Francorchamps Circuit?',
+      lat: 50.4372,
+      lng: 5.9714,
+    ),
+    Question(
+      id: 'suzuka',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Suzuka Circuit?',
+      lat: 34.8431,
+      lng: 136.5408,
+    ),
+    Question(
+      id: 'interlagos',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Interlagos Circuit?',
+      lat: -23.7036,
+      lng: -46.6997,
+    ),
+    Question(
+      id: 'yas_marina',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Yas Marina Circuit?',
+      lat: 24.4672,
+      lng: 54.6031,
+    ),
+    Question(
+      id: 'circuit_de_barcelona',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Circuit de Barcelona-Catalunya?',
+      lat: 41.5700,
+      lng: 2.2611,
+    ),
+    Question(
+      id: 'red_bull_ring',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Red Bull Ring?',
+      lat: 47.2197,
+      lng: 14.7647,
+    ),
+    Question(
+      id: 'hungaroring',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Hungaroring?',
+      lat: 47.5789,
+      lng: 19.2486,
+    ),
+    Question(
+      id: 'marina_bay',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Marina Bay Street Circuit?',
+      lat: 1.2914,
+      lng: 103.8644,
+    ),
+    Question(
+      id: 'circuit_gilles_villeneuve',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Circuit Gilles Villeneuve?',
+      lat: 45.5000,
+      lng: -73.5278,
+    ),
+    Question(
+      id: 'cota',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Circuit of the Americas?',
+      lat: 30.1328,
+      lng: -97.6411,
+    ),
+    Question(
+      id: 'zandvoort',
+      categoryId: 'f1_circuits',
+      prompt: 'Where is Zandvoort Circuit?',
+      lat: 52.3889,
+      lng: 4.5408,
+    ),
+
+    // --- WORLD FAMOUS BRANDS ---
+    Question(
+      id: 'ikea_sweden',
+      categoryId: 'famous_brands',
+      prompt: 'Where is IKEA from?',
+      lat: 56.8389,
+      lng: 14.8258,
+    ),
+    Question(
+      id: 'samsung_korea',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Samsung from?',
+      lat: 37.5665,
+      lng: 126.9780,
+    ),
+    Question(
+      id: 'nokia_finland',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Nokia from?',
+      lat: 60.1695,
+      lng: 24.9354,
+    ),
+    Question(
+      id: 'bmw_germany',
+      categoryId: 'famous_brands',
+      prompt: 'Where is BMW from?',
+      lat: 48.1351,
+      lng: 11.5820,
+    ),
+    Question(
+      id: 'mercedes_germany',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Mercedes-Benz from?',
+      lat: 48.7758,
+      lng: 9.1829,
+    ),
+    Question(
+      id: 'audi_germany',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Audi from?',
+      lat: 48.3668,
+      lng: 10.8986,
+    ),
+    Question(
+      id: 'ferrari_italy',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Ferrari from?',
+      lat: 44.5311,
+      lng: 10.8644,
+    ),
+    Question(
+      id: 'lamborghini_italy',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Lamborghini from?',
+      lat: 44.6478,
+      lng: 11.1283,
+    ),
+    Question(
+      id: 'apple_usa',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Apple from?',
+      lat: 37.3318,
+      lng: -122.0312,
+    ),
+    Question(
+      id: 'coca_cola_usa',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Coca-Cola from?',
+      lat: 33.7490,
+      lng: -84.3880,
+    ),
+    Question(
+      id: 'toyota_japan',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Toyota from?',
+      lat: 35.0844,
+      lng: 137.1536,
+    ),
+    Question(
+      id: 'sony_japan',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Sony from?',
+      lat: 35.6762,
+      lng: 139.7653,
+    ),
+    Question(
+      id: 'adidas_germany',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Adidas from?',
+      lat: 49.4521,
+      lng: 11.0767,
+    ),
+    Question(
+      id: 'lego_denmark',
+      categoryId: 'famous_brands',
+      prompt: 'Where is LEGO from?',
+      lat: 55.7308,
+      lng: 9.1242,
+    ),
+    Question(
+      id: 'nestle_switzerland',
+      categoryId: 'famous_brands',
+      prompt: 'Where is Nestlé from?',
+      lat: 46.4667,
+      lng: 6.8333,
+    ),
+
+    // --- FAMOUS PEOPLE & CHARACTERS ---
+    Question(
+      id: 'santa_claus',
+      categoryId: 'famous_people',
+      prompt: 'Where is Santa Claus from?',
+      lat: 66.5039,
+      lng: 25.7294,
+    ),
+    Question(
+      id: 'dracula',
+      categoryId: 'famous_people',
+      prompt: 'Where is Count Dracula from?',
+      lat: 45.5144,
+      lng: 25.3675,
+    ),
+    Question(
+      id: 'messi',
+      categoryId: 'famous_people',
+      prompt: 'Where is Lionel Messi from?',
+      lat: -32.9442,
+      lng: -60.6505,
+    ),
+    Question(
+      id: 'cristiano_ronaldo',
+      categoryId: 'famous_people',
+      prompt: 'Where is Cristiano Ronaldo from?',
+      lat: 32.6669,
+      lng: -16.9241,
+    ),
+    Question(
+      id: 'shakespeare',
+      categoryId: 'famous_people',
+      prompt: 'Where is William Shakespeare from?',
+      lat: 52.1917,
+      lng: -1.7078,
+    ),
+    Question(
+      id: 'mozart',
+      categoryId: 'famous_people',
+      prompt: 'Where is Wolfgang Amadeus Mozart from?',
+      lat: 47.8095,
+      lng: 13.0550,
+    ),
+    Question(
+      id: 'einstein',
+      categoryId: 'famous_people',
+      prompt: 'Where is Albert Einstein from?',
+      lat: 48.3984,
+      lng: 9.9908,
+    ),
+    Question(
+      id: 'picasso',
+      categoryId: 'famous_people',
+      prompt: 'Where is Pablo Picasso from?',
+      lat: 36.7213,
+      lng: -4.4214,
+    ),
+    Question(
+      id: 'beethoven',
+      categoryId: 'famous_people',
+      prompt: 'Where is Ludwig van Beethoven from?',
+      lat: 50.7374,
+      lng: 7.0982,
+    ),
+    Question(
+      id: 'napoleon',
+      categoryId: 'famous_people',
+      prompt: 'Where is Napoleon Bonaparte from?',
+      lat: 41.9270,
+      lng: 8.7369,
+    ),
+    Question(
+      id: 'tesla',
+      categoryId: 'famous_people',
+      prompt: 'Where is Nikola Tesla from?',
+      lat: 44.5553,
+      lng: 15.8783,
+    ),
+    Question(
+      id: 'pele',
+      categoryId: 'famous_people',
+      prompt: 'Where is Pelé from?',
+      lat: -23.2237,
+      lng: -45.9009,
+    ),
+    Question(
+      id: 'maradona',
+      categoryId: 'famous_people',
+      prompt: 'Where is Diego Maradona from?',
+      lat: -34.6037,
+      lng: -58.3816,
+    ),
+    Question(
+      id: 'sherlock_holmes',
+      categoryId: 'famous_people',
+      prompt: 'Where is Sherlock Holmes from?',
+      lat: 51.5074,
+      lng: -0.1278,
+    ),
+    Question(
+      id: 'harry_potter',
+      categoryId: 'famous_people',
+      prompt: 'Where is Harry Potter from?',
+      lat: 51.5074,
+      lng: -0.1278,
     ),
 
     // --- US STATES (50 states, Alaska & Hawaii dahil) ---
