@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'stat_card.dart';
 import 'theme_provider.dart';
 import 'music_provider.dart';
@@ -838,11 +839,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.star_rate),
             title: Text(loc.get('rate_app')),
-            onTap: () {
+            onTap: () async {
               HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.get('rate_app_coming_soon'))),
-              );
+              final url = Uri.parse('https://apps.apple.com/tr/app/geopin-geography-master/id6756518038');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
             },
           ),
           const Divider(height: 1),
@@ -851,8 +853,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: Text(loc.get('share_app')),
             onTap: () {
               HapticFeedback.selectionClick();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.get('share_app_coming_soon'))),
+              Share.share(
+                'Check out GeoPin - Geography Master! Test your geography knowledge with fun challenges. Download now: https://apps.apple.com/tr/app/geopin-geography-master/id6756518038',
+                subject: 'GeoPin - Geography Master',
               );
             },
           ),
