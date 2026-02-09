@@ -1,47 +1,47 @@
-# GeoPin
+GeoPin
 
 GeoPin is an iOS geography game where you answer location challenges by placing pins on a map.
 
-## Highlights
+Highlights
 
-- **Map-based gameplay**
+- Map-based gameplay
   - Answer questions by pinning the correct location on the map and earn points.
-- **Category-based challenges**
+- Category-based challenges
   - Multiple themes (e.g. tourist places, capitals, etc.).
-- **Localization**
+- Localization
   - In-app localization infrastructure (TR/EN).
-- **Premium (IAP)**
+- Premium (IAP)
   - Premium access via RevenueCat (`purchases_flutter`).
-- **Background music**
+- Background music
   - Optional looping background music using `audioplayers`.
 
-## Tech Stack
+Tech Stack
 
-- **Flutter / Dart**
-- **flutter_map + latlong2** (map & coordinates)
-- **flutter_riverpod** (state management)
-- **shared_preferences / hive** (local persistence)
-- **purchases_flutter** (RevenueCat / in-app purchases)
-- **url_launcher / share_plus** (links & sharing)
+- Flutter / Dart
+- flutter_map + latlong2 (map & coordinates)
+- flutter_riverpod (state management)
+- shared_preferences / hive (local persistence)
+- purchases_flutter (RevenueCat / in-app purchases)
+- url_launcher / share_plus (links & sharing)
 
-## Repository Structure (iOS-only)
+Repository Structure (iOS-only)
 
 - `lib/` Application source code
 - `assets/` Images, JSON data and audio files
 - `ios/` Xcode project and iOS configuration
 - `pubspec.yaml` Dependencies and assets
 
-## Getting Started (iOS)
+Getting Started (iOS)
 
-> Note: This repository was intentionally simplified for the iOS target. Android/web/desktop folders were removed.
+Note: This repository was intentionally simplified for the iOS target. Android/web/desktop folders were removed.
 
-### Requirements
+Requirements
 
 - Flutter SDK (Dart 3+)
 - Xcode
 - CocoaPods
 
-### Run
+Run
 
 ```bash
 flutter pub get
@@ -53,7 +53,7 @@ cd ..
 flutter run
 ```
 
-## In-App Purchases (RevenueCat)
+In-App Purchases (RevenueCat)
 
 This app uses RevenueCat (`purchases_flutter`). Before running a production build:
 
@@ -62,10 +62,9 @@ This app uses RevenueCat (`purchases_flutter`). Before running a production buil
 
 Do not commit signing files, certificates, or private keys to this repository.
 
-## App Store
+App Store
 
-- App Store link: (add your link here)
+- App Store link: apps.apple.com/tr/app/geopin-geography-master/id6756518038
 
-## License
 
-All rights reserved. (If you prefer, we can replace this section with an explicit license.)
+
