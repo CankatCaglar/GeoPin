@@ -28,10 +28,29 @@ migrate_working_dir/
 **/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins-dependencies
+.flutter-plugins-dependencies*
 .pub-cache/
 .pub/
 /build/
 /coverage/
+
+ # iOS/macOS CocoaPods
+ ios/Pods/
+ macos/Pods/
+
+ # Flutter iOS generated files
+ ios/Flutter/Flutter*.podspec
+ ios/Flutter/Generated*.xcconfig
+ ios/Flutter/flutter_export_environment*.sh
+
+ # Xcode
+ **/DerivedData/
+ **/*.xcuserstate
+ **/xcuserdata/
+ **/.symlinks/
+
+ # Accidental duplicate lockfiles
+ pubspec *lock
 
 # Symbolication related
 app.*.symbols
